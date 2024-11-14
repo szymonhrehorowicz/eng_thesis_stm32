@@ -29,7 +29,12 @@ extern "C" {
 #include "main.h"
 
 /* USER CODE BEGIN Includes */
-
+#include "stdint.h"
+/*
+    TIM1 - FAN CTRL
+    TIM3 - FAN TACH
+    TIM5 - COIL CTRL
+*/
 /* USER CODE END Includes */
 
 extern TIM_HandleTypeDef htim1;
@@ -62,4 +67,3 @@ void PWM_setPulse(PWMController_t *this, uint16_t pulse);
 #endif
 
 #endif /* __TIM_H__ */
-
