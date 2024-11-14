@@ -5,9 +5,7 @@
  *      Author: Szymon
  */
 
-#include "coil_controller.h"
 #include "control/coil_controller.h"
-#include "temperature.h"
 #include "measurements/temperature.h"
 
 void CoilController_reset(CoilController_t *this)

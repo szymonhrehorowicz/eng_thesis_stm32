@@ -12,27 +12,10 @@
 #include "utils/iir_filter.h"
 #include "control/bang_bang.h"
 #include "control/pid.h"
+#include "control/controller_enums.h"
 #include "tim.h"
 
 #define NUMBER_OF_THERMISTORS 2u
-
-typedef enum
-{
-    TEMP_TOP,
-    TEMP_BOTTOM,
-} RefTemperature_t;
-
-typedef enum
-{
-    PID,
-    BANG_BANG,
-} UsedController_t;
-
-typedef enum
-{
-    OFF,
-    ON,
-} OperationMode_t;
 
 typedef struct
 {
