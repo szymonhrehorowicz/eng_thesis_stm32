@@ -29,7 +29,7 @@ extern "C" {
 #include "main.h"
 
 /* USER CODE BEGIN Includes */
-
+#include "stdint.h"
 /* USER CODE END Includes */
 
 extern TIM_HandleTypeDef htim1;
@@ -39,6 +39,11 @@ extern TIM_HandleTypeDef htim3;
 extern TIM_HandleTypeDef htim5;
 
 /* USER CODE BEGIN Private defines */
+typedef struct
+{
+  TIM_HandleTypeDef *handle;
+  uint8_t channel;
+} PWMController_t;
 
 /* USER CODE END Private defines */
 
@@ -49,7 +54,7 @@ void MX_TIM5_Init(void);
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 
 /* USER CODE BEGIN Prototypes */
-
+void PWM_setPulse(PWMController_t *this, uint16_t pulse);
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus

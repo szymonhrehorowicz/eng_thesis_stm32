@@ -12,6 +12,7 @@
 #include "utils/iir_filter.h"
 #include "control/bang_bang.h"
 #include "control/pid.h"
+#include "tim.h"
 
 #define NUMBER_OF_THERMISTORS 2u
 
@@ -42,13 +43,15 @@ typedef struct
     PID_t PID_controller;
     BBController_t BB_controller;
     UsedController_t used_controller;
-    // PWM control handler
+    PWMController_t PWM[NUMBER_OF_THERMISTORS];
     OperationMode_t mode;
 } CoilController_t;
 
 void CoilController_reset(CoilController_t *this);
 void CoilController_update(CoilController_t *this);
 void CoilController_configureFilters(CoilController_t *this, uint16_t cutoff_freq);
-void CoilController_useController(CoilController_t *this, UsedController_t controller);
+void CoilController_setController(CoilController_t *this, UsedController_t controller);
+void CoilController_setRefTemp(CoilController_t *this, RefTemperature_t ref_temp);
+void CoilController_setRefValue(CoilController_t *this, uint16_t set_value);
 
 #endif /* INC_CONTROL_COIL_CONTROLLER_H_ */
