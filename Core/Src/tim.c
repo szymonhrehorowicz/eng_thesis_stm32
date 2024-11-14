@@ -370,6 +370,11 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* tim_baseHandle)
 }
 
 /* USER CODE BEGIN 1 */
+void PWM_setPulse(PWMController_t *this, uint16_t pulse)
+{
+  __HAL_TIM_SET_COMPARE(this->handle, this->channel, pulse);
+}
+
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 {
     if(htim == &htim3)
