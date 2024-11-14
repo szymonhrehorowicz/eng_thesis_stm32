@@ -5,9 +5,7 @@
  *      Author: Szymon
  */
 
-#include "coil_controller.h"
 #include "control/coil_controller.h"
-#include "temperature.h"
 #include "measurements/temperature.h"
 
 void CoilController_reset(CoilController_t *this)
@@ -31,7 +29,8 @@ void CoilController_update(CoilController_t *this)
         if(this->used_controller == PID)
         {
             PID_update(&this->PID_controller, this->filters[this->ref_temp].value);
-        }else {
+        }else 
+        {
             BBController_update(&this->BB_controller, this->filters[this->ref_temp].value);
         }
     }else

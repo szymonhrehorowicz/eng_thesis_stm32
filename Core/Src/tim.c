@@ -21,7 +21,7 @@
 #include "tim.h"
 
 /* USER CODE BEGIN 0 */
-
+#include "main.h"
 /* USER CODE END 0 */
 
 TIM_HandleTypeDef htim1;
@@ -370,5 +370,20 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* tim_baseHandle)
 }
 
 /* USER CODE BEGIN 1 */
-
+void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
+{
+    if(htim == &htim3)
+    {
+        if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1)
+        {
+            /*
+                Calculate the measured speed of the FAN
+            */
+            static const float FAN_CLK_FREQ = 84000000.0f;
+            static const float FAN_CLK_PRES = 3360.0f;
+            uint32_t tim_val = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
+            float fan_speed = FAN_CLK_FREQ / FAN_CLK_PRES / (tim_val + 1.0f);
+        }
+    }
+}
 /* USER CODE END 1 */

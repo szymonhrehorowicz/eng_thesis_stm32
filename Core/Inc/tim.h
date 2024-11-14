@@ -29,7 +29,11 @@ extern "C" {
 #include "main.h"
 
 /* USER CODE BEGIN Includes */
-
+/*
+    TIM1 - FAN CTRL
+    TIM3 - FAN TACH
+    TIM5 - COIL CTRL
+*/
 /* USER CODE END Includes */
 
 extern TIM_HandleTypeDef htim1;
