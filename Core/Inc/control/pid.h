@@ -16,10 +16,10 @@ typedef struct
     int16_t errror;
     int16_t prev_error;
     uint16_t set_value;
-    float    Kp;
-    float    Ki;
-    float    Kd;
-    float    Kaw; // anti-windup constant
+    float Kp;
+    float Ki;
+    float Kd;
+    float Kaw; // anti-windup constant
     uint16_t u;
     uint16_t u_saturated;
     float u_p;

@@ -5,6 +5,9 @@
         "iir_filter.h": "c",
         "stdint.h": "c",
         "math.h": "c",
-        "corecrt_math_defines.h": "c"
+        "corecrt_math_defines.h": "c",
+        "fan_controller.h": "c",
+        "tim.h": "c",
+        "temperature.h": "c"
     }
 }

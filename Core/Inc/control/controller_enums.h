@@ -10,20 +10,19 @@
 
 typedef enum
 {
-    TEMP_TOP,
-    TEMP_BOTTOM,
+    TEMP_TOP, TEMP_BOTTOM,
 } RefTemperature_t;
 
 typedef enum
 {
-    PID,
-    BANG_BANG,
+    PID, BANG_BANG,
 } UsedController_t;
 
 typedef enum
 {
-    OFF,
-    ON,
+    OFF, ON,
 } OperationMode_t;
+
+#define SAMPLE_TIME_MS 1.0f // miliseconds
 
 #endif /* INC_CONTROL_CONTROLLER_ENUMS_H_ */

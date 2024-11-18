@@ -12,11 +12,10 @@
 
 typedef enum
 {
-    BB_OFF,
-    BB_ON
+    BB_OFF, BB_ON
 } BBCommand_t;
 
-typedef struct 
+typedef struct
 {
     uint16_t set_value;
     uint16_t threshold_top;
@@ -27,7 +26,8 @@ typedef struct
 } BBController_t;
 
 void BBController_update(BBController_t *this, uint16_t current_value);
-void BBController_setParams(BBController_t *this, uint16_t set_value, uint16_t hysteresis, int16_t hysteresis_shift);
+void BBController_setParams(BBController_t *this, uint16_t set_value,
+        uint16_t hysteresis, int16_t hysteresis_shift);
 void BBController_reset(BBController_t *this);
 
 #endif /* INC_CONTROL_BANG_BANG_H_ */

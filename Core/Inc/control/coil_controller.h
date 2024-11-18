@@ -30,11 +30,16 @@ typedef struct
     OperationMode_t mode;
 } CoilController_t;
 
-void CoilController_reset(CoilController_t *this);
+void CoilController_init(CoilController_t *this);
 void CoilController_update(CoilController_t *this);
-void CoilController_configureFilters(CoilController_t *this, uint16_t cutoff_freq);
-void CoilController_setController(CoilController_t *this, UsedController_t controller);
-void CoilController_setRefTemp(CoilController_t *this, RefTemperature_t ref_temp);
+void CoilController_setFilters(CoilController_t *this, uint16_t cutoff_freq);
+void CoilController_setController(CoilController_t *this,
+        UsedController_t controller);
+void CoilController_setRefTemp(CoilController_t *this,
+        RefTemperature_t ref_temp);
 void CoilController_setRefValue(CoilController_t *this, uint16_t set_value);
+void CoilController_setMode(CoilController_t *this, OperationMode_t mode);
+
+extern CoilController_t coilController;
 
 #endif /* INC_CONTROL_COIL_CONTROLLER_H_ */

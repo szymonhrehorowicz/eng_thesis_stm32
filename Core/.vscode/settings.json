@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "coil_controller.h": "c"
+        "coil_controller.h": "c",
+        "stm32f4xx_it.h": "c"
     }
 }

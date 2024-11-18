@@ -13,6 +13,7 @@
 #include "control/bang_bang.h"
 #include "control/pid.h"
 #include "control/controller_enums.h"
+#include "tim.h"
 
 typedef struct
 {
@@ -21,13 +22,18 @@ typedef struct
     PID_t PID_controller;
     BBController_t BB_controller;
     UsedController_t used_controller;
+    PWMController_t PWM;
     OperationMode_t mode;
 } FanController_t;
 
-void FanController_reset(FanController_t *this);
+void FanController_init(FanController_t *this);
 void FanController_update(FanController_t *this);
-void FanController_configureFilters(FanController_t *this, uint16_t cutoff_freq);
-void FanController_useController(FanController_t *this, UsedController_t controller);
+void FanController_setFilters(FanController_t *this, uint16_t cutoff_freq);
+void FanController_setController(FanController_t *this,
+        UsedController_t controller);
+void FanController_setRefValue(FanController_t *this, uint16_t set_value);
+void FanController_setMode(FanController_t *this, OperationMode_t mode);
 
+extern FanController_t fanController;
 
 #endif /* INC_CONTROL_FAN_CONTROLLER_H_ */
