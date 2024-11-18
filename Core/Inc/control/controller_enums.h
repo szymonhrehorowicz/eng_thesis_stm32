@@ -31,5 +31,6 @@ typedef enum
 
 #define SAMPLE_TIME_MS 10.0f // miliseconds
 #define MAX_TEMPERATURE 100  // deg C
+#define MIN_TEMPERATURE 0    // deg C
 
 #endif /* INC_CONTROL_CONTROLLER_ENUMS_H_ */

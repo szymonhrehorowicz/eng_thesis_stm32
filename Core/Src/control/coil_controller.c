@@ -36,10 +36,10 @@ void CoilController_init(CoilController_t *this)
     // PID controller
     PID_reset(&this->PID_controller);
     this->PID_controller.sample_time = SAMPLE_TIME_MS;
-    this->PID_controller.Kp = 30;
-    this->PID_controller.Ki = 2;
-    this->PID_controller.Kd = 0.1;
-    this->PID_controller.Kaw = 1;
+    this->PID_controller.Kp = 100;
+    this->PID_controller.Ki = 0;
+    this->PID_controller.Kd = 0;
+    this->PID_controller.Kaw = 0;
     this->PID_controller.max = 1000-1;
     this->PID_controller.min = 0;
 
@@ -77,10 +77,10 @@ void CoilController_update(CoilController_t *this)
             BBController_update(&this->BB_controller, this->temperatures[this->ref_temp]);
             if (this->BB_controller.command == BB_ON)
             {
-                PWM_setPulse(&this->PWM[this->ref_coil].handle, this->BB_controller.u_max);
+                PWM_setPulse(&(this->PWM[this->ref_coil]), this->BB_controller.u_max);
             } else
             {
-                PWM_setPulse(&this->PWM[this->ref_coil].handle, this->BB_controller.u_min);
+                PWM_setPulse(&(this->PWM[this->ref_coil]), this->BB_controller.u_min);
             }
         }
     } else
@@ -93,8 +93,8 @@ void CoilController_update(CoilController_t *this)
     // Overheat protection
     if((this->temperatures[TEMP_TOP] >= MAX_TEMPERATURE) || (this->temperatures[TEMP_BOTTOM] >= MAX_TEMPERATURE))
     {
-        PWM_setPulse(&this->PWM[COIL_A].handle, 0);
-        PWM_setPulse(&this->PWM[COIL_B].handle, 0);
+        PWM_setPulse(&(this->PWM[COIL_A]), 0);
+        PWM_setPulse(&(this->PWM[COIL_B]), 0);
         HAL_GPIO_WritePin(LED_ERROR_GPIO_Port, LED_ERROR_Pin, GPIO_PIN_SET);
     } else
     {

@@ -28,12 +28,11 @@
 /* USER CODE BEGIN Includes */
 #include "control/fan_controller.h"
 #include "control/coil_controller.h"
-#include "control/bang_bang.h"
+#include "communication.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -116,16 +115,15 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-    HAL_Delay(10000); // wait for ADC to calculate real temperature
-    CoilController_setRefCoil(&coilController, COIL_A);
-    CoilController_setController(&coilController, PID);
-    CoilController_setRefTemp(&coilController, TEMP_TOP);
-    CoilController_setRefValue(&coilController, 60);
-    CoilController_setMode(&coilController, ON);
+    // HAL_Delay(10000); // wait for ADC to calculate real temperature
+    // CoilController_setRefCoil(&coilController, COIL_A);
+    // CoilController_setController(&coilController, PID);
+    // CoilController_setRefTemp(&coilController, TEMP_TOP);
+    // CoilController_setRefValue(&coilController, 60);
+    //CoilController_setMode(&coilController, ON);
     while (1)
     {
-        HAL_Delay(20000);
-        CoilController_setRefValue(&coilController, 40);
+        COM_checkConnection();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

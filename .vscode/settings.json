@@ -8,6 +8,11 @@
         "corecrt_math_defines.h": "c",
         "fan_controller.h": "c",
         "tim.h": "c",
-        "temperature.h": "c"
+        "temperature.h": "c",
+        "usbd_cdc_if.h": "c",
+        "usbd_core.h": "c",
+        "coil_controller.h": "c",
+        "adc.h": "c",
+        "communication.h": "c"
     }
 }
