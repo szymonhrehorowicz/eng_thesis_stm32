@@ -105,9 +105,9 @@ int main(void)
     HAL_TIM_IC_Start_IT(&htim3, TIM_CHANNEL_1);
     HAL_TIM_IC_Start(&htim3, TIM_CHANNEL_2);
     // PWM controllers initialization
-    HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
-    HAL_TIM_PWM_Start(&htim5, TIM_CHANNEL_3);
-    HAL_TIM_PWM_Start(&htim5, TIM_CHANNEL_4);
+    HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1); // Fan PWM
+    HAL_TIM_PWM_Start(&htim5, TIM_CHANNEL_3); // Coil A PWM
+    HAL_TIM_PWM_Start(&htim5, TIM_CHANNEL_4); // Coil B PWM
     // Periodic interrupt
     HAL_TIM_Base_Start_IT(&htim4);
     // Temperature measurement
@@ -116,9 +116,16 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+    HAL_Delay(10000); // wait for ADC to calculate real temperature
+    CoilController_setRefCoil(&coilController, COIL_A);
+    CoilController_setController(&coilController, PID);
+    CoilController_setRefTemp(&coilController, TEMP_TOP);
+    CoilController_setRefValue(&coilController, 60);
+    CoilController_setMode(&coilController, ON);
     while (1)
     {
-        BBController_setParams(&coilController.BB_controller, 40, 10, 0);
+        HAL_Delay(20000);
+        CoilController_setRefValue(&coilController, 40);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

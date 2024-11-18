@@ -23,6 +23,7 @@ typedef struct
     uint16_t temperatures[NUMBER_OF_THERMISTORS];
     uint16_t raw_voltages[NUMBER_OF_THERMISTORS];
     RefTemperature_t ref_temp;
+    RefCoil_t ref_coil;
     PID_t PID_controller;
     BBController_t BB_controller;
     UsedController_t used_controller;
@@ -38,6 +39,7 @@ void CoilController_setController(CoilController_t *this,
 void CoilController_setRefTemp(CoilController_t *this,
         RefTemperature_t ref_temp);
 void CoilController_setRefValue(CoilController_t *this, uint16_t set_value);
+void CoilController_setRefCoil(CoilController_t *this, RefCoil_t coil);
 void CoilController_setMode(CoilController_t *this, OperationMode_t mode);
 
 extern CoilController_t coilController;

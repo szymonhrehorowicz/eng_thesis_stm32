@@ -9,28 +9,29 @@
 
 void PID_update(PID_t *this, uint16_t current_value)
 {
-    this->errror = (int16_t) this->set_value - (int16_t) current_value;
+    this->errror = (float)this->set_value - (float)current_value;
 
-    // Calculate parts of control signal
-    this->u_p = (float) this->Kp * this->errror;
-    this->u_i = ((float) this->Ki * this->errror * this->sample_time)
-            + (float) this->Kaw * (this->u_saturated - this->u)
-                    * this->sample_time;
+    // Calculate proportional part
+    this->u_p = (float) this->Kp * (float) this->errror;
+
+    // Calculate integral part
+    this->integral_sum += this->errror * this->sample_time / 1000.0f;
+    this->aw_integral_sum += (this->u_saturated - this->u) * this->sample_time / 1000.0f;
+    this->u_i = (this->Ki * this->integral_sum) + (this->Kaw * this->aw_integral_sum);
+
+    // Calculate derivative part
     this->u_d = (float) this->Kd * (this->errror - this->prev_error)
-            * this->sample_time;
+            * this->sample_time / 1000.0f;
 
     // Calculate control signal
     this->u = this->u_p + this->u_i + this->u_d;
 
-    // If out of bound, saturate control signal
-    if (this->u > this->max)
-    {
+    if (this->u > this->max) {
         this->u_saturated = this->max;
-    } else if (this->u < this->min)
-    {
+    }
+    else if (this->u < this->min) {
         this->u_saturated = this->min;
-    } else
-    {
+    } else {
         this->u_saturated = this->u;
     }
 

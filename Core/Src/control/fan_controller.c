@@ -21,7 +21,7 @@ void FanController_init(FanController_t *this)
 
     // BB controller
     BBController_reset(&this->BB_controller);
-    this->BB_controller.u_max = 1000 - 1;
+    this->BB_controller.u_max = 160 - 1;
     this->BB_controller.u_min = 0;
     BBController_setParams(&this->BB_controller, 2000, 200, 0);
 
@@ -32,7 +32,7 @@ void FanController_init(FanController_t *this)
     this->PID_controller.Ki = 1;
     this->PID_controller.Kd = 1;
     this->PID_controller.Kaw = 1;
-    this->PID_controller.max = 1000-1;
+    this->PID_controller.max = 160-1;
     this->PID_controller.min = 0;
 
     // PWM controller
@@ -87,14 +87,15 @@ void FanController_setController(FanController_t *this,
 
 void FanController_setRefValue(FanController_t *this, uint16_t set_value)
 {
-    this->BB_controller.set_value = set_value;
-    this->PID_controller.set_value = set_value;
     BBController_reset(&this->BB_controller);
     PID_reset(&this->PID_controller);
+
+    uint16_t hysteresis = this->BB_controller.threshold_top - this->BB_controller.threshold_bottom;
+    BBController_setParams(&this->BB_controller, set_value, hysteresis, 0);
+    this->PID_controller.set_value = set_value;
 }
 
 void FanController_setMode(FanController_t *this, OperationMode_t mode)
 {
-    FanController_init(this);
     this->mode = mode;
 }

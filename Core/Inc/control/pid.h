@@ -9,12 +9,15 @@
 #define INC_CONTROL_PID_H_
 
 #include "stdint.h"
+#include "utils/iir_filter.h"
 
 typedef struct
 {
     uint16_t sample_time; // ms
-    int16_t errror;
-    int16_t prev_error;
+    float errror;
+    float prev_error;
+    float integral_sum;
+    float aw_integral_sum;
     uint16_t set_value;
     float Kp;
     float Ki;

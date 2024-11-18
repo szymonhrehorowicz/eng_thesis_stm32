@@ -10,8 +10,14 @@
 
 typedef enum
 {
-    TEMP_TOP, TEMP_BOTTOM,
+    TEMP_TOP, TEMP_BOTTOM, // top - outter, bottom - inner
 } RefTemperature_t;
+
+typedef enum
+{
+    COIL_A,
+    COIL_B,
+} RefCoil_t;
 
 typedef enum
 {
@@ -23,6 +29,7 @@ typedef enum
     OFF, ON,
 } OperationMode_t;
 
-#define SAMPLE_TIME_MS 1.0f // miliseconds
+#define SAMPLE_TIME_MS 10.0f // miliseconds
+#define MAX_TEMPERATURE 100  // deg C
 
 #endif /* INC_CONTROL_CONTROLLER_ENUMS_H_ */
