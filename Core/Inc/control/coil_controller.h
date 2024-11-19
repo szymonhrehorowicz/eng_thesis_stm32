@@ -21,7 +21,7 @@ typedef struct
 {
     IIRfilter_t filters[NUMBER_OF_THERMISTORS];
     uint16_t temperatures[NUMBER_OF_THERMISTORS];
-    uint32_t raw_voltages[NUMBER_OF_THERMISTORS];
+    uint16_t raw_voltages[NUMBER_OF_THERMISTORS];
     RefTemperature_t ref_temp;
     RefCoil_t ref_coil;
     PID_t PID_controller;

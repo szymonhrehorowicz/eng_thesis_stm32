@@ -76,13 +76,13 @@ static inline uint8_t c2u8(char c)
 
 void COM_translateMsg(uint8_t *msg, uint16_t len)
 {
+    uint8_t msg_var = c2u8(msg[MSG_VAR]);
     switch(c2u8(msg[MSG_TYPE]))
     {
         case APP_CON_REQ:
             CDC_Transmit_FS((uint8_t *)con_tx_str, strlen(con_tx_str));
             break;
         case FAN_CONF_MSG:
-            uint8_t msg_var = c2u8(msg[MSG_VAR]);
             switch(msg_var)
             {
                 case SET_CONTROLLER:
@@ -109,8 +109,8 @@ void COM_translateMsg(uint8_t *msg, uint16_t len)
                     float ktens, kones, kdtens, kdhundreds;
                     ktens = c2u8(msg[MSG_BODY + 1]) * 10;
                     kones = c2u8(msg[MSG_BODY + 2]);
-                    kdtens = c2u8(msg[MSG_BODY + 2]) / 10.0f;
-                    kdhundreds = c2u8(msg[MSG_BODY + 3]) / 100.0f;
+                    kdtens = c2u8(msg[MSG_BODY + 4]) / 10.0f;
+                    kdhundreds = c2u8(msg[MSG_BODY + 5]) / 100.0f;
                     float Kx = khundreds + ktens + kones + kdtens + kdhundreds;
                     if((Kx >= 0.0f) && (Kx <= 1000.0f))
                     {
@@ -165,7 +165,7 @@ void COM_translateMsg(uint8_t *msg, uint16_t len)
             }
             break;
         case COIL_CONF_MSG:
-            switch(msg[MSG_VAR])
+            switch(msg_var)
             {
                 case SET_CONTROLLER:
                     // BANG_BANG / PID
@@ -191,8 +191,8 @@ void COM_translateMsg(uint8_t *msg, uint16_t len)
                     float ktens, kones, kdtens, kdhundreds;
                     ktens = c2u8(msg[MSG_BODY + 1]) * 10;
                     kones = c2u8(msg[MSG_BODY + 2]);
-                    kdtens = c2u8(msg[MSG_BODY + 2]) / 10.0f;
-                    kdhundreds = c2u8(msg[MSG_BODY + 3]) / 100.0f;
+                    kdtens = c2u8(msg[MSG_BODY + 4]) / 10.0f;
+                    kdhundreds = c2u8(msg[MSG_BODY + 5]) / 100.0f;
                     float Kx = khundreds + ktens + kones + kdtens + kdhundreds;
                     if((Kx >= 0.0f) && (Kx <= 1000.0f))
                     {
@@ -250,11 +250,17 @@ void COM_translateMsg(uint8_t *msg, uint16_t len)
                     break;
                 case SET_REF_COIL:
                     uint8_t coil = c2u8(msg[MSG_BODY]);
-                    CoilController_setRefCoil(&coilController, coil);
+                    if((coil == COIL_A) || (coil == COIL_B))
+                    {
+                        CoilController_setRefCoil(&coilController, coil);
+                    }
                     break;
                 case SET_REF_TEMP:
                     uint8_t ref_temp = c2u8(msg[MSG_BODY]);
-                    CoilController_setRefTemp(&coilController, ref_temp);
+                    if((ref_temp == TEMP_BOTTOM) || (ref_temp == TEMP_TOP))
+                    {
+                        CoilController_setRefTemp(&coilController, ref_temp);
+                    }
                     break;
                 default:
                     break;
