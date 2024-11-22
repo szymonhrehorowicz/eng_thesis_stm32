@@ -12,6 +12,5 @@
 
 void COM_checkConnection(void);
 void COM_translateMsg(uint8_t *msg, uint16_t len);
-void COM_transmit(uint8_t *buffer, uint16_t len);
 
 #endif /* INC_COMMUNICATION_H_ */

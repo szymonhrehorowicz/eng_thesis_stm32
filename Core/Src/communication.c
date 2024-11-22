@@ -10,6 +10,7 @@
 #include "usb_device.h"
 #include "usbd_cdc_if.h"
 #include "string.h"
+#include "stdio.h"
 #include "control/coil_controller.h"
 #include "control/fan_controller.h"
 
@@ -34,10 +35,13 @@ typedef enum
     APP_CON_REQ,
     FAN_CONF_MSG,
     COIL_CONF_MSG,
+    FAN_DATA_MSG,
+    COIL_DATA_MSG,
 } MsgType_t;
 
 typedef enum
 {
+    // Config messages
     SET_CONTROLLER,
     SET_REF_VALUE,
     SET_MODE,
@@ -48,26 +52,37 @@ typedef enum
     SET_KD,
     SET_HYST,
     SET_HYST_SHIFT,
+    // Data messages
+    GET_BB_SET_VALUE,
+    GET_BB_THRESHOLD_TOP,
+    GET_BB_THRESHOLD_BOTTOM,
+    GET_BB_U_MAX,
+    GET_BB_U_MIN,
+    GET_BB_CMD,
+    GET_PID_SET_VALUE,
+    GET_PID_ERROR,
+    GET_PID_INTEGRAL_ERROR,
+    GET_PID_AW_INTEGRAL_ERROR,
+    GET_PID_KP,
+    GET_PID_KI,
+    GET_PID_KD,
+    GET_PID_KAW,
+    GET_PID_U,
+    GET_PID_U_SATURATED,
+    GET_PID_U_P,
+    GET_PID_U_I,
+    GET_PID_U_D,
+    GET_PID_MAX,
+    GET_PID_MIN,
+    GET_COIL_TEMPERATURES,
+    GET_COIL_MODE,
+    GET_FAN_SPEED,
+    GET_FAN_MODE,
 } ControlMsg_t;
 
 #define MSG_TYPE 0u
 #define MSG_VAR  1u
 #define MSG_BODY 2u
-
-void COM_transmit(uint8_t *buffer, uint16_t len)
-{
-    CDC_Transmit_FS(buffer, len);
-}
-
-void COM_sendControlParameters(void)
-{
-
-}
-
-void COM_sendMeasurements(void)
-{
-
-}
 
 static inline uint8_t c2u8(char c)
 {
@@ -215,7 +230,7 @@ void COM_translateMsg(uint8_t *msg, uint16_t len)
                 case SET_HYST:
                 case SET_HYST_SHIFT:
                 case SET_REF_VALUE:
-                    // Expected 0 - 6000
+                    // Expected 0000 - 00100
                     uint16_t thousands, hundreds, tens, ones;
                     thousands = c2u8(msg[MSG_BODY]) * 1000;
                     hundreds = c2u8(msg[MSG_BODY + 1]) * 100;
@@ -261,6 +276,206 @@ void COM_translateMsg(uint8_t *msg, uint16_t len)
                     {
                         CoilController_setRefTemp(&coilController, ref_temp);
                     }
+                    break;
+                default:
+                    break;
+            }
+            break;
+        case FAN_DATA_MSG:
+            char msg[10];
+            int len;
+            switch(msg_var)
+            {
+                case GET_BB_SET_VALUE:
+                    len = sprintf(msg, "%d", fanController.BB_controller.set_value);
+                    CDC_Transmit_FS((uint8_t *)msg, len);
+                    break;
+                case GET_BB_THRESHOLD_TOP:
+                    len = sprintf(msg, "%d", fanController.BB_controller.threshold_top);
+                    CDC_Transmit_FS((uint8_t *)msg, len);
+                    break;
+                case GET_BB_THRESHOLD_BOTTOM:
+                    len = sprintf(msg, "%d", fanController.BB_controller.threshold_bottom);
+                    CDC_Transmit_FS((uint8_t *)msg, len);
+                    break;
+                case GET_BB_U_MAX:
+                    len = sprintf(msg, "%d", fanController.BB_controller.u_max);
+                    CDC_Transmit_FS((uint8_t *)msg, len);
+                    break;
+                case GET_BB_U_MIN:
+                    len = sprintf(msg, "%d", fanController.BB_controller.u_min);
+                    CDC_Transmit_FS((uint8_t *)msg, len);
+                    break;
+                case GET_BB_CMD:
+                    len = sprintf(msg, "%d", fanController.BB_controller.command);
+                    CDC_Transmit_FS((uint8_t *)msg, len);
+                    break;
+                case GET_PID_SET_VALUE:
+                    len = sprintf(msg, "%d", fanController.PID_controller.set_value);
+                    CDC_Transmit_FS((uint8_t *)msg, len);
+                    break;
+                case GET_PID_ERROR:
+                    len = sprintf(msg, "%f", fanController.PID_controller.errror); // @suppress("Float formatting support")
+                    CDC_Transmit_FS((uint8_t *)msg, len);
+                    break;
+                case GET_PID_INTEGRAL_ERROR:
+                    len = sprintf(msg, "%f", fanController.PID_controller.integral_sum);
+                    CDC_Transmit_FS((uint8_t *)msg, len);
+                    break;
+                case GET_PID_AW_INTEGRAL_ERROR:
+                    len = sprintf(msg, "%f", fanController.PID_controller.aw_integral_sum);
+                    CDC_Transmit_FS((uint8_t *)msg, len);
+                    break;
+                case GET_PID_KP:
+                    len = sprintf(msg, "%f", fanController.PID_controller.Kp);
+                    CDC_Transmit_FS((uint8_t *)msg, len);
+                    break;
+                case GET_PID_KI:
+                    len = sprintf(msg, "%f", fanController.PID_controller.Ki);
+                    CDC_Transmit_FS((uint8_t *)msg, len);
+                    break;
+                case GET_PID_KD:
+                    len = sprintf(msg, "%f", fanController.PID_controller.Kd);
+                    CDC_Transmit_FS((uint8_t *)msg, len);
+                    break;
+                case GET_PID_KAW:
+                    len = sprintf(msg, "%f", fanController.PID_controller.Kaw);
+                    CDC_Transmit_FS((uint8_t *)msg, len);
+                    break;
+                case GET_PID_U:
+                    len = sprintf(msg, "%d", fanController.PID_controller.u);
+                    CDC_Transmit_FS((uint8_t *)msg, len);
+                    break;
+                case GET_PID_U_SATURATED:
+                    len = sprintf(msg, "%d", fanController.PID_controller.u_saturated);
+                    CDC_Transmit_FS((uint8_t *)msg, len);
+                    break;
+                case GET_PID_U_P:
+                    len = sprintf(msg, "%d", fanController.PID_controller.u_p);
+                    CDC_Transmit_FS((uint8_t *)msg, len);
+                    break;
+                case GET_PID_U_I:
+                    len = sprintf(msg, "%d", fanController.PID_controller.u_i);
+                    CDC_Transmit_FS((uint8_t *)msg, len);
+                    break;
+                case GET_PID_U_D:
+                    len = sprintf(msg, "%d", fanController.PID_controller.u_d);
+                    CDC_Transmit_FS((uint8_t *)msg, len);
+                    break;
+                case GET_PID_MAX:
+                    len = sprintf(msg, "%d", fanController.PID_controller.max);
+                    CDC_Transmit_FS((uint8_t *)msg, len);
+                    break;
+                case GET_PID_MIN:
+                    len = sprintf(msg, "%d", fanController.PID_controller.min);
+                    CDC_Transmit_FS((uint8_t *)msg, len);
+                    break;
+                case GET_FAN_SPEED:
+                    len = sprintf(msg, "%d", fanController.filter.value);
+                    CDC_Transmit_FS((uint8_t *)msg, len);
+                    break;
+                case GET_FAN_MODE:
+                    len = sprintf(msg, "%d", fanController.mode);
+                    CDC_Transmit_FS((uint8_t *)msg, len);
+                    break;
+                default:
+                    break;
+            }
+            break;
+        case COIL_DATA_MSG:
+            switch(msg_var)
+            {
+                case GET_BB_SET_VALUE:
+                    len = sprintf(msg, "%d", coilController.BB_controller.set_value);
+                    CDC_Transmit_FS((uint8_t *)msg, len);
+                    break;
+                case GET_BB_THRESHOLD_TOP:
+                    len = sprintf(msg, "%d", coilController.BB_controller.threshold_top);
+                    CDC_Transmit_FS((uint8_t *)msg, len);
+                    break;
+                case GET_BB_THRESHOLD_BOTTOM:
+                    len = sprintf(msg, "%d", coilController.BB_controller.threshold_bottom);
+                    CDC_Transmit_FS((uint8_t *)msg, len);
+                    break;
+                case GET_BB_U_MAX:
+                    len = sprintf(msg, "%d", coilController.BB_controller.u_max);
+                    CDC_Transmit_FS((uint8_t *)msg, len);
+                    break;
+                case GET_BB_U_MIN:
+                    len = sprintf(msg, "%d", coilController.BB_controller.u_min);
+                    CDC_Transmit_FS((uint8_t *)msg, len);
+                    break;
+                case GET_BB_CMD:
+                    len = sprintf(msg, "%d", coilController.BB_controller.command);
+                    CDC_Transmit_FS((uint8_t *)msg, len);
+                    break;
+                case GET_PID_SET_VALUE:
+                    len = sprintf(msg, "%d", coilController.PID_controller.set_value);
+                    CDC_Transmit_FS((uint8_t *)msg, len);
+                    break;
+                case GET_PID_ERROR:
+                    len = sprintf(msg, "%f", coilController.PID_controller.errror);
+                    CDC_Transmit_FS((uint8_t *)msg, len);
+                    break;
+                case GET_PID_INTEGRAL_ERROR:
+                    len = sprintf(msg, "%f", coilController.PID_controller.integral_sum);
+                    CDC_Transmit_FS((uint8_t *)msg, len);
+                    break;
+                case GET_PID_AW_INTEGRAL_ERROR:
+                    len = sprintf(msg, "%f", coilController.PID_controller.aw_integral_sum);
+                    CDC_Transmit_FS((uint8_t *)msg, len);
+                    break;
+                case GET_PID_KP:
+                    len = sprintf(msg, "%f", coilController.PID_controller.Kp);
+                    CDC_Transmit_FS((uint8_t *)msg, len);
+                    break;
+                case GET_PID_KI:
+                    len = sprintf(msg, "%f", coilController.PID_controller.Ki);
+                    CDC_Transmit_FS((uint8_t *)msg, len);
+                    break;
+                case GET_PID_KD:
+                    len = sprintf(msg, "%f", coilController.PID_controller.Kd);
+                    CDC_Transmit_FS((uint8_t *)msg, len);
+                    break;
+                case GET_PID_KAW:
+                    len = sprintf(msg, "%f", coilController.PID_controller.Kaw);
+                    CDC_Transmit_FS((uint8_t *)msg, len);
+                    break;
+                case GET_PID_U:
+                    len = sprintf(msg, "%d", coilController.PID_controller.u);
+                    CDC_Transmit_FS((uint8_t *)msg, len);
+                    break;
+                case GET_PID_U_SATURATED:
+                    len = sprintf(msg, "%d", coilController.PID_controller.u_saturated);
+                    CDC_Transmit_FS((uint8_t *)msg, len);
+                    break;
+                case GET_PID_U_P:
+                    len = sprintf(msg, "%f", coilController.PID_controller.u_p);
+                    CDC_Transmit_FS((uint8_t *)msg, len);
+                    break;
+                case GET_PID_U_I:
+                    len = sprintf(msg, "%f", coilController.PID_controller.u_i);
+                    CDC_Transmit_FS((uint8_t *)msg, len);
+                    break;
+                case GET_PID_U_D:
+                    len = sprintf(msg, "%f", coilController.PID_controller.u_d);
+                    CDC_Transmit_FS((uint8_t *)msg, len);
+                    break;
+                case GET_PID_MAX:
+                    len = sprintf(msg, "%d", coilController.PID_controller.max);
+                    CDC_Transmit_FS((uint8_t *)msg, len);
+                    break;
+                case GET_PID_MIN:
+                    len = sprintf(msg, "%d", coilController.PID_controller.min);
+                    CDC_Transmit_FS((uint8_t *)msg, len);
+                    break;
+                case GET_COIL_TEMPERATURES:
+                    len = sprintf(msg, "%d_%d", coilController.temperatures[TEMP_TOP], coilController.temperatures[TEMP_BOTTOM]);
+                    CDC_Transmit_FS((uint8_t *)msg, len);
+                    break;
+                case GET_COIL_MODE:
+                    len = sprintf(msg, "%d", coilController.mode);
+                    CDC_Transmit_FS((uint8_t *)msg, len);
                     break;
                 default:
                     break;
