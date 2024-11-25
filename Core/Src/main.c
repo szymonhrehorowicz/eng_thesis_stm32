@@ -96,6 +96,7 @@ int main(void)
   MX_TIM1_Init();
   MX_TIM5_Init();
   MX_TIM4_Init();
+  MX_TIM9_Init();
   /* USER CODE BEGIN 2 */
     // Controllers init
     FanController_init(&fanController);
@@ -109,21 +110,24 @@ int main(void)
     HAL_TIM_PWM_Start(&htim5, TIM_CHANNEL_4); // Coil B PWM
     // Periodic interrupt
     HAL_TIM_Base_Start_IT(&htim4);
+    HAL_TIM_Base_Start_IT(&htim9);
     // Temperature measurement
     HAL_ADC_Start_DMA(&hadc1, coilController.raw_voltages, NUMBER_OF_THERMISTORS);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-    // HAL_Delay(10000); // wait for ADC to calculate real temperature
-    // CoilController_setRefCoil(&coilController, COIL_A);
-    // CoilController_setController(&coilController, PID);
-    // CoilController_setRefTemp(&coilController, TEMP_TOP);
-    // CoilController_setRefValue(&coilController, 60);
-    //CoilController_setMode(&coilController, ON);
+    static char fan_msg[] = {'3','3','5'};
+    static char heater_msg[] = {'4','3','7'};
     while (1)
     {
-        COM_checkConnection();
+        if(COM_checkConnection())
+        {
+            COM_translateMsg((uint8_t *)fan_msg, 3);
+            HAL_Delay(50);
+            COM_translateMsg((uint8_t *)heater_msg, 3);
+            HAL_Delay(50);
+        }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
