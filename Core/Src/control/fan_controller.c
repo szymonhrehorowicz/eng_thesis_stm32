@@ -22,7 +22,7 @@ void FanController_init(FanController_t *this)
     // BB controller
     BBController_reset(&this->BB_controller);
     this->BB_controller.u_max = 160 - 1;
-    this->BB_controller.u_min = 0;
+    this->BB_controller.u_min = 16-1;
     BBController_setParams(&this->BB_controller, 2000, 200, 0);
 
     // PID controller
@@ -33,7 +33,7 @@ void FanController_init(FanController_t *this)
     this->PID_controller.Kd = 1;
     this->PID_controller.Kaw = 1;
     this->PID_controller.max = 160-1;
-    this->PID_controller.min = 0;
+    this->PID_controller.min = 16-1;
 
     // PWM controller
     this->PWM.channel = TIM_CHANNEL_1;

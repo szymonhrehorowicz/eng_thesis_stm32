@@ -556,20 +556,33 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
+    static const uint16_t allDataTenMsgsBufferSize = 1350;
+    static const uint16_t fastDataTenMsgsBufferSize = 710;
+
+    static uint8_t allDataWasSent = 0;
     if (htim == &htim4)
     {
         // Update controllers
-        HAL_GPIO_TogglePin(LED_POWER_GPIO_Port, LED_POWER_Pin);
+        
+        static volatile uint8_t dataToSend[1350];
+
+        HAL_GPIO_WritePin(LED_POWER_GPIO_Port, LED_POWER_Pin, GPIO_PIN_SET);
         FanController_update(&fanController);
         CoilController_update(&coilController);
-    }
-    if (htim == &htim9)
-    {
-        // Send fast data messages
-        /*static char fan_msg[] = {'3','3','6'};
-        static char heater_msg[] = {'4','3','8'};
-        COM_translateMsg(fan_msg, 3);
-        COM_translateMsg(heater_msg, 3);*/
+        HAL_GPIO_WritePin(LED_POWER_GPIO_Port, LED_POWER_Pin, GPIO_PIN_RESET);
+        if(isConnected && (allDataWasSent == 0))
+        {
+            COM_sendAllData();
+            allDataWasSent = 1;
+        }else if(isConnected && allDataWasSent)
+        {
+            COM_sendFastData();
+        }
+
+        if(isConnected == 0)
+        {
+            allDataWasSent = 0;
+        }
     }
 }
 /* USER CODE END 1 */

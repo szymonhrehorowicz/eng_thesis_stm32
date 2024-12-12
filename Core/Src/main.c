@@ -110,23 +110,22 @@ int main(void)
     HAL_TIM_PWM_Start(&htim5, TIM_CHANNEL_4); // Coil B PWM
     // Periodic interrupt
     HAL_TIM_Base_Start_IT(&htim4);
-    HAL_TIM_Base_Start_IT(&htim9);
     // Temperature measurement
     HAL_ADC_Start_DMA(&hadc1, coilController.raw_voltages, NUMBER_OF_THERMISTORS);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-    static char fan_msg[] = {'3','3','5'};
-    static char heater_msg[] = {'4','3','7'};
+
     while (1)
     {
-        if(COM_checkConnection())
+        COM_checkConnection();
+
+        if(((HAL_GetTick() > lastMsgTimestamp) && (wasAlreadyReset == 0)))
         {
-            COM_translateMsg((uint8_t *)fan_msg, 3);
-            HAL_Delay(50);
-            COM_translateMsg((uint8_t *)heater_msg, 3);
-            HAL_Delay(50);
+            FanController_setMode(&fanController, OFF);
+            CoilController_setMode(&coilController, OFF);
+            wasAlreadyReset = 1;
         }
     /* USER CODE END WHILE */
 
