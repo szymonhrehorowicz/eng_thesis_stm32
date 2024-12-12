@@ -570,6 +570,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
         FanController_update(&fanController);
         CoilController_update(&coilController);
         HAL_GPIO_WritePin(LED_POWER_GPIO_Port, LED_POWER_Pin, GPIO_PIN_RESET);
+
         if(isConnected && (allDataWasSent == 0))
         {
             COM_sendAllData();

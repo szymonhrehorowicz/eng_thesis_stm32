@@ -14,6 +14,8 @@
         "coil_controller.h": "c",
         "adc.h": "c",
         "communication.h": "c",
-        "dma.h": "c"
+        "dma.h": "c",
+        "control_reference.h": "c",
+        "cmath": "c"
     }
 }
