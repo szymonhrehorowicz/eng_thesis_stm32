@@ -45,6 +45,8 @@ void FanController_update(FanController_t *this)
 {
     // Filter the raw speed measurement
     IIR_update(&this->filter, this->speed);
+    ControlReference_update(&(this->control_reference));
+    this->PID_controller.set_value = this->control_reference.ref_value;
 
     if (this->mode == ON)
     {

@@ -13,6 +13,7 @@
 #include "control/bang_bang.h"
 #include "control/pid.h"
 #include "control/controller_enums.h"
+#include "control/control_reference.h"
 #include "tim.h"
 
 typedef struct
@@ -24,6 +25,7 @@ typedef struct
     UsedController_t used_controller;
     PWMController_t PWM;
     OperationMode_t mode;
+    ControlReference_t control_reference;
 } FanController_t;
 
 void FanController_init(FanController_t *this);

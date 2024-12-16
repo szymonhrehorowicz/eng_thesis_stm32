@@ -21,7 +21,7 @@ uint8_t ccc2u8(uint8_t *c)
     return ((uint8_t)(c[0] - '0') * 100) + ((uint8_t)(c[1] - '0') * 10) + ((uint8_t)(c[2]) - '0');
 }
 
-uint16_t cccc2u8(uint8_t *c)
+uint16_t cccc2u16(uint8_t *c)
 {
     uint16_t thousands, hundreds, tens, ones;
     thousands = c2u8(c[0]) * 1000;

@@ -556,10 +556,6 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-    static const uint16_t allDataTenMsgsBufferSize = 1350;
-    static const uint16_t fastDataTenMsgsBufferSize = 710;
-
-    static uint8_t allDataWasSent = 0;
     if (htim == &htim4)
     {
         // Update controllers
@@ -571,19 +567,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
         CoilController_update(&coilController);
         HAL_GPIO_WritePin(LED_POWER_GPIO_Port, LED_POWER_Pin, GPIO_PIN_RESET);
 
-        if(isConnected && (allDataWasSent == 0))
-        {
-            COM_sendAllData();
-            allDataWasSent = 1;
-        }else if(isConnected && allDataWasSent)
-        {
-            COM_sendFastData();
-        }
-
-        if(isConnected == 0)
-        {
-            allDataWasSent = 0;
-        }
+        COM_sendAllData();
     }
 }
 /* USER CODE END 1 */

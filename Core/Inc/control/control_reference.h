@@ -25,13 +25,13 @@ typedef struct
 typedef struct
 {
     uint16_t amplitude;
-    uint16_t omega;
+    float omega;
 } SinewaveReference_t;
 
 typedef struct ControlReference
 {
     uint16_t               sample_time;
-    uint32_t               time;
+    float                  time;
     ControlReferenceType_t type;
     uint16_t               set_value;
     uint16_t               ref_value;
@@ -39,9 +39,11 @@ typedef struct ControlReference
     SinewaveReference_t    *sinewave;
 } ControlReference_t;
 
+void ControlReference_init(ControlReference_t *fan_ref, ControlReference_t *coil_ref);
 void ControlReference_update(ControlReference_t* this);
 
-extern volatile ControlReference_t fanPIDreference;
-extern volatile ControlReference_t coilPIDreference;
+void ControlReference_setStepReference(ControlReference_t *this, uint16_t set_value);
+void ControlReference_setRampReference(ControlReference_t *this, uint16_t set_value, uint16_t slope /* unit/s */);
+void ControlReference_setSineReference(ControlReference_t *this, uint16_t set_value, uint16_t amplitude, float omega);
 
 #endif /* INC_CONTROL_CONTROL_REFERENCE_H_ */

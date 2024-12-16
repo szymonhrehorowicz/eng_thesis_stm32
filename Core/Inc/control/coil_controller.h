@@ -13,6 +13,7 @@
 #include "control/bang_bang.h"
 #include "control/pid.h"
 #include "control/controller_enums.h"
+#include "control/control_reference.h"
 #include "tim.h"
 
 #define NUMBER_OF_THERMISTORS 2u
@@ -29,6 +30,7 @@ typedef struct
     UsedController_t used_controller;
     PWMController_t PWM[NUMBER_OF_THERMISTORS];
     OperationMode_t mode;
+    ControlReference_t control_reference;
 } CoilController_t;
 
 void CoilController_init(CoilController_t *this);

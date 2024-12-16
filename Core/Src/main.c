@@ -28,6 +28,7 @@
 /* USER CODE BEGIN Includes */
 #include "control/fan_controller.h"
 #include "control/coil_controller.h"
+#include "control/control_reference.h"
 #include "communication.h"
 /* USER CODE END Includes */
 
@@ -116,6 +117,7 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+    ControlReference_init(&fanController.control_reference, &coilController.control_reference);
 
     while (1)
     {

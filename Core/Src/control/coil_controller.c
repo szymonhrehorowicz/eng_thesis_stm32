@@ -63,6 +63,9 @@ void CoilController_update(CoilController_t *this)
         IIR_update(&this->filters[therm_id], this->temperatures[therm_id]);
     }
 
+    ControlReference_update(&(this->control_reference));
+    this->PID_controller.set_value = this->control_reference.ref_value;
+
     if (this->mode == ON)
     {
         HAL_GPIO_WritePin(LED_COIL_GPIO_Port, LED_COIL_Pin, GPIO_PIN_SET);
@@ -114,8 +117,8 @@ void CoilController_setFilters(CoilController_t *this, uint16_t cutoff_freq)
 void CoilController_setController(CoilController_t *this,
         UsedController_t controller)
 {
-    BBController_reset(&this->BB_controller);
-    PID_reset(&this->PID_controller);
+    // BBController_reset(&this->BB_controller);
+    // PID_reset(&this->PID_controller);
 
     this->used_controller = controller;
 }
@@ -130,8 +133,8 @@ void CoilController_setRefTemp(CoilController_t *this,
 
 void CoilController_setRefValue(CoilController_t *this, uint16_t set_value)
 {
-    BBController_reset(&this->BB_controller);
-    PID_reset(&this->PID_controller);
+    // BBController_reset(&this->BB_controller);
+    // PID_reset(&this->PID_controller);
 
     uint16_t hysteresis = this->BB_controller.threshold_top - this->BB_controller.threshold_bottom;
     BBController_setParams(&this->BB_controller, set_value, hysteresis, 0);

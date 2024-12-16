@@ -16,6 +16,8 @@
         "communication.h": "c",
         "dma.h": "c",
         "control_reference.h": "c",
-        "cmath": "c"
+        "cmath": "c",
+        "cstddef": "c",
+        "type_traits": "c"
     }
 }
