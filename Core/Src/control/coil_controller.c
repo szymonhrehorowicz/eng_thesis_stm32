@@ -66,7 +66,7 @@ void CoilController_update(CoilController_t *this)
     ControlReference_update(&(this->control_reference));
     this->PID_controller.set_value = this->control_reference.ref_value;
 
-    if (this->mode == ON)
+    if (this->mode == ON || this->mode == COMBINED)
     {
         HAL_GPIO_WritePin(LED_COIL_GPIO_Port, LED_COIL_Pin, GPIO_PIN_SET);
 

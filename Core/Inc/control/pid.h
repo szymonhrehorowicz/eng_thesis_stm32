@@ -33,6 +33,7 @@ typedef struct
 } PID_t;
 
 void PID_update(PID_t *this, uint16_t current_value);
+void PID_update_with_error_injection(PID_t *this, float error);
 void PID_reset(PID_t *this);
 
 #endif /* INC_CONTROL_PID_H_ */

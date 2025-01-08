@@ -26,7 +26,7 @@ typedef enum
 
 typedef enum
 {
-    OFF, ON,
+    OFF, ON, COMBINED
 } OperationMode_t;
 
 #define SAMPLE_TIME_MS 10.0f // miliseconds

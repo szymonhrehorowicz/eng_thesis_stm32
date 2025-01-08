@@ -7,6 +7,7 @@
 
 #include "control/fan_controller.h"
 #include "stm32f4xx_hal_gpio.h"
+#include "math.h"
 
 FanController_t fanController;
 
@@ -41,17 +42,24 @@ void FanController_init(FanController_t *this)
     PWM_setPulse(&this->PWM, 0);
 }
 
-void FanController_update(FanController_t *this)
+void FanController_update(FanController_t *this, float error_injection)
 {
     // Filter the raw speed measurement
     IIR_update(&this->filter, this->speed);
     ControlReference_update(&(this->control_reference));
     this->PID_controller.set_value = this->control_reference.ref_value;
 
-    if (this->mode == ON)
+    if (this->mode == ON || this->mode == COMBINED)
     {
         HAL_GPIO_WritePin(FAN_ON_GPIO_Port, FAN_ON_Pin, GPIO_PIN_SET);
         HAL_GPIO_WritePin(LED_FAN_GPIO_Port, LED_FAN_Pin, GPIO_PIN_SET);
+
+        if (this->mode == COMBINED)
+        {
+            PID_update_with_error_injection(&this->PID_controller, -1.0f * error_injection);
+            PWM_setPulse(&this->PWM, this->PID_controller.u_saturated);
+            return;
+        }
 
         if (this->used_controller == PID)
         {

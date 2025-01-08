@@ -29,7 +29,7 @@ typedef struct
 } FanController_t;
 
 void FanController_init(FanController_t *this);
-void FanController_update(FanController_t *this);
+void FanController_update(FanController_t *this, float error_injection);
 void FanController_setFilters(FanController_t *this, uint16_t cutoff_freq);
 void FanController_setController(FanController_t *this,
         UsedController_t controller);

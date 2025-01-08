@@ -18,6 +18,7 @@
         "control_reference.h": "c",
         "cmath": "c",
         "cstddef": "c",
-        "type_traits": "c"
+        "type_traits": "c",
+        "cstdlib": "c"
     }
 }
