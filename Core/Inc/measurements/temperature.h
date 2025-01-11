@@ -10,6 +10,6 @@
 
 #include "stdint.h"
 
-int NTC_ADC2Temperature(uint16_t adc_value);
+float NTC_ADC2Temperature(uint16_t adc_value);
 
 #endif /* INC_MEASUREMENTS_TEMPERATURE_H_ */

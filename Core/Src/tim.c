@@ -559,7 +559,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     if (htim == &htim4)
     {
         CoilController_update(&coilController);
-        FanController_update(&fanController, coilController.PID_controller.error);
+        FanController_update(&fanController, coilController.PID_controller.error.value);
 
         COM_sendAllData();
     }

@@ -14,7 +14,7 @@
 typedef struct
 {
     uint16_t sample_time; // ms
-    float error;
+    IIRfilter_t error;
     float prev_error;
     float integral_sum;
     float aw_integral_sum;
