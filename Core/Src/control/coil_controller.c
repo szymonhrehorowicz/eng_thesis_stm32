@@ -24,7 +24,7 @@ void CoilController_init(CoilController_t *this)
     for(uint8_t filter_id = 0; filter_id < NUMBER_OF_THERMISTORS; ++filter_id)
     {
         this->filters[filter_id].sample_time = SAMPLE_TIME_MS;
-        IIR_setCutoffFreq(&(this->filters[filter_id]), 5);
+        IIR_setCutoffFreq(&(this->filters[filter_id]), 1);
     }
     
     // BB controller
@@ -36,6 +36,8 @@ void CoilController_init(CoilController_t *this)
     // PID controller
     PID_reset(&this->PID_controller);
     this->PID_controller.sample_time = SAMPLE_TIME_MS;
+    this->PID_controller.error.sample_time = SAMPLE_TIME_MS;
+    IIR_setCutoffFreq(&(this->PID_controller.error), 5);
     this->PID_controller.Kp = 100;
     this->PID_controller.Ki = 0;
     this->PID_controller.Kd = 0;

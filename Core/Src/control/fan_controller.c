@@ -18,7 +18,7 @@ void FanController_init(FanController_t *this)
 
     // Filter
     this->filter.sample_time = SAMPLE_TIME_MS; // ms
-    IIR_setCutoffFreq(&this->filter, 5);
+    IIR_setCutoffFreq(&this->filter, 1);
 
     // BB controller
     BBController_reset(&this->BB_controller);
@@ -29,6 +29,8 @@ void FanController_init(FanController_t *this)
     // PID controller
     PID_reset(&this->PID_controller);
     this->PID_controller.sample_time = SAMPLE_TIME_MS;
+    this->PID_controller.error.sample_time = SAMPLE_TIME_MS;
+    IIR_setCutoffFreq(&(this->PID_controller.error), 5);
     this->PID_controller.Kp = 10;
     this->PID_controller.Ki = 1;
     this->PID_controller.Kd = 1;
