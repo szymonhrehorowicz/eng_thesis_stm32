@@ -18,7 +18,7 @@ void FanController_init(FanController_t *this)
 
     // Filter
     this->filter.sample_time = SAMPLE_TIME_MS; // ms
-    IIR_setCutoffFreq(&this->filter, 100);
+    IIR_setCutoffFreq(&this->filter, 5);
 
     // BB controller
     BBController_reset(&this->BB_controller);
