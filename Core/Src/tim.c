@@ -558,10 +558,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
     if (htim == &htim4)
     {
-        HAL_GPIO_WritePin(LED_POWER_GPIO_Port, LED_POWER_Pin, GPIO_PIN_SET);
         CoilController_update(&coilController);
         FanController_update(&fanController, coilController.PID_controller.error);
-        HAL_GPIO_WritePin(LED_POWER_GPIO_Port, LED_POWER_Pin, GPIO_PIN_RESET);
 
         COM_sendAllData();
     }

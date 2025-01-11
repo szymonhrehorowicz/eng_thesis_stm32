@@ -41,3 +41,13 @@ float ccc_cc2f(uint8_t *c)
     kdhundreds = c2u8(c[5]) / 100.0f;
     return khundreds + ktens + kones + kdtens + kdhundreds;
 }
+
+void float_to_bytes(uint8_t* buffer, uint8_t *idx, float *value)
+{
+    uint8_t *byte_ptr = (uint8_t*)value;
+
+    buffer[*idx] = byte_ptr[3]; *idx += 1;
+    buffer[*idx] = byte_ptr[2]; *idx += 1;
+    buffer[*idx] = byte_ptr[1]; *idx += 1;
+    buffer[*idx] = byte_ptr[0]; *idx += 1;
+}
