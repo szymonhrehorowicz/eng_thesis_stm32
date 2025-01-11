@@ -159,7 +159,7 @@ void COM_sendAllData(void)
     msg[msg_idx] = (uint8_t)(fanController.PID_controller.set_value >> 8); msg_idx++;
     msg[msg_idx] = (uint8_t)(fanController.PID_controller.set_value & 0x00ff); msg_idx++;
         // Error
-    float_to_bytes(msg, &msg_idx, &(fanController.PID_controller.error));
+    float_to_bytes(msg, &msg_idx, &(fanController.PID_controller.error.value));
         // Integral sum
     float_to_bytes(msg, &msg_idx, &(fanController.PID_controller.integral_sum));
         // Ant-windup integral sum
@@ -218,7 +218,7 @@ void COM_sendAllData(void)
     msg[msg_idx] = (uint8_t)(coilController.PID_controller.set_value >> 8); msg_idx++;
     msg[msg_idx] = (uint8_t)(coilController.PID_controller.set_value & 0x00ff); msg_idx++;
         // Error
-    float_to_bytes(msg, &msg_idx, &(coilController.PID_controller.error));
+    float_to_bytes(msg, &msg_idx, &(coilController.PID_controller.error.value));
         // Integral sum
     float_to_bytes(msg, &msg_idx, &(coilController.PID_controller.integral_sum));
         // Ant-windup integral sum
@@ -289,7 +289,7 @@ void COM_sendFastData(void)
 
     // PID
         // Error
-    float_to_bytes(msg, &msg_idx, &(fanController.PID_controller.error));
+    float_to_bytes(msg, &msg_idx, &(fanController.PID_controller.error.value));
         // Integral sum
     float_to_bytes(msg, &msg_idx, &(fanController.PID_controller.integral_sum));
         // Ant-windup integral sum
@@ -316,7 +316,7 @@ void COM_sendFastData(void)
 
     // PID
         // Error
-    float_to_bytes(msg, &msg_idx, &(coilController.PID_controller.error));
+    float_to_bytes(msg, &msg_idx, &(coilController.PID_controller.error.value));
         // Integral sum
     float_to_bytes(msg, &msg_idx, &(coilController.PID_controller.integral_sum));
         // Ant-windup integral sum
@@ -390,9 +390,10 @@ void COM_translateMsg(uint8_t *msg, uint16_t len)
                     break;
             }
             // BANG BANG
-            //BBController_reset(&(fanController.BB_controller));
+            BBController_reset(&(fanController.BB_controller));
             BBController_setParams(&(fanController.BB_controller), cccc2u16(&msg[MSG_BODY + BB_SET_VAL]), cccc2u16(&msg[MSG_BODY + BB_HYSTERESIS]), 0);
             // PID
+            PID_reset(&(fanController.PID_controller));
             fanController.PID_controller.Kp = ccc_cc2f(&msg[MSG_BODY + PID_KP]);
             fanController.PID_controller.Ki = ccc_cc2f(&msg[MSG_BODY + PID_KI]);
             fanController.PID_controller.Kd = ccc_cc2f(&msg[MSG_BODY + PID_KD]);
@@ -432,12 +433,13 @@ void COM_translateMsg(uint8_t *msg, uint16_t len)
                    break;
             }
             // BANG BANG
-            // BBController_reset(&(coilController.BB_controller));
+            BBController_reset(&(coilController.BB_controller));
             BBController_setParams(&(coilController.BB_controller), cccc2u16(&msg[MSG_BODY + BB_SET_VAL]), cccc2u16(&msg[MSG_BODY + BB_HYSTERESIS]), 0);
             coilController.BB_controller.u_max = c2u8(msg[MSG_BODY + CONTROLLER_TYPE]) == BANG_BANG ?
                     (uint16_t)((float)BB_U_MAX * ((float)ccc2u8(&msg[MSG_BODY + COIL_POWER])/100.0f)) :
                     BB_U_MAX;
             // PID
+            PID_reset(&(coilController.PID_controller));
             coilController.PID_controller.Kp = ccc_cc2f(&msg[MSG_BODY + PID_KP]);
             coilController.PID_controller.Ki = ccc_cc2f(&msg[MSG_BODY + PID_KI]);
             coilController.PID_controller.Kd = ccc_cc2f(&msg[MSG_BODY + PID_KD]);
