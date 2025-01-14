@@ -20,6 +20,7 @@
 
 typedef struct
 {
+    IIRfilter_t error;
     IIRfilter_t filters[NUMBER_OF_THERMISTORS];
     float temperatures[NUMBER_OF_THERMISTORS];
     uint16_t raw_voltages[NUMBER_OF_THERMISTORS];
@@ -31,6 +32,10 @@ typedef struct
     PWMController_t PWM[NUMBER_OF_THERMISTORS];
     OperationMode_t mode;
     ControlReference_t control_reference;
+    uint16_t u;
+    uint16_t u_saturated;
+    uint16_t u_max;
+    uint16_t u_min;
 } CoilController_t;
 
 void CoilController_init(CoilController_t *this);
@@ -43,6 +48,7 @@ void CoilController_setRefTemp(CoilController_t *this,
 void CoilController_setRefValue(CoilController_t *this, uint16_t set_value);
 void CoilController_setRefCoil(CoilController_t *this, RefCoil_t coil);
 void CoilController_setMode(CoilController_t *this, OperationMode_t mode);
+void CoilController_reset(CoilController_t *this);
 
 extern CoilController_t coilController;
 

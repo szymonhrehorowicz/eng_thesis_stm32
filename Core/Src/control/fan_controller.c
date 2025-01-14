@@ -22,21 +22,19 @@ void FanController_init(FanController_t *this)
 
     // BB controller
     BBController_reset(&this->BB_controller);
-    this->BB_controller.u_max = 160 - 1;
-    this->BB_controller.u_min = 16-1;
-    BBController_setParams(&this->BB_controller, 2000, 200, 0);
+    BBController_setParams(&this->BB_controller, 0.0f);
 
     // PID controller
     PID_reset(&this->PID_controller);
     this->PID_controller.sample_time = SAMPLE_TIME_MS;
-    this->PID_controller.error.sample_time = SAMPLE_TIME_MS;
-    IIR_setCutoffFreq(&(this->PID_controller.error), 5);
-    this->PID_controller.Kp = 10;
-    this->PID_controller.Ki = 1;
-    this->PID_controller.Kd = 1;
-    this->PID_controller.Kaw = 1;
-    this->PID_controller.max = 160-1;
-    this->PID_controller.min = 16-1;
+    this->error.sample_time = SAMPLE_TIME_MS;
+    IIR_setCutoffFreq(&this->error, 1);
+    this->PID_controller.Kp = 0;
+    this->PID_controller.Ki = 0;
+    this->PID_controller.Kd = 0;
+    this->PID_controller.Kaw = 0;
+    this->u_max = FAN_U_MAX;
+    this->u_min = FAN_U_MIN;
 
     // PWM controller
     this->PWM.channel = TIM_CHANNEL_1;
@@ -44,40 +42,35 @@ void FanController_init(FanController_t *this)
     PWM_setPulse(&this->PWM, 0);
 }
 
-void FanController_update(FanController_t *this, float error_injection)
+void FanController_update(FanController_t *this)
 {
     // Filter the raw speed measurement
     IIR_update(&this->filter, this->speed);
     ControlReference_update(&(this->control_reference));
-    this->PID_controller.set_value = this->control_reference.ref_value;
+    IIR_update(&this->error, this->control_reference.ref_value - this->filter.value);
 
-    if (this->mode == ON || this->mode == COMBINED)
+    if (this->mode == ON)
     {
-        HAL_GPIO_WritePin(FAN_ON_GPIO_Port, FAN_ON_Pin, GPIO_PIN_SET);
-        HAL_GPIO_WritePin(LED_FAN_GPIO_Port, LED_FAN_Pin, GPIO_PIN_SET);
-
-        if (this->mode == COMBINED)
-        {
-            PID_update_with_error_injection(&this->PID_controller, -1.0f * error_injection);
-            PWM_setPulse(&this->PWM, this->PID_controller.u_saturated);
-            return;
-        }
+        HAL_GPIO_WritePin(LED_COIL_GPIO_Port, LED_COIL_Pin, GPIO_PIN_SET);
 
         if (this->used_controller == PID)
         {
-            PID_update(&this->PID_controller, this->filter.value);
-            PWM_setPulse(&this->PWM, this->PID_controller.u_saturated);
+            this->u = PID_update(&this->PID_controller, this->error.value, this->u_saturated - this->u);
         } else
         {
-            BBController_update(&this->BB_controller, this->filter.value);
-            if(this->BB_controller.command == BB_ON)
-            {
-                PWM_setPulse(&this->PWM, this->BB_controller.u_max);
-            }else
-            {
-                PWM_setPulse(&this->PWM, this->BB_controller.u_min);
-            }
+            this->u = this->u_max * BBController_update(&this->BB_controller, this->error.value);
         }
+
+        if (this->u > this->u_max) {
+            this->u_saturated = this->u_max;
+        }
+        else if (this->u < this->u_min) {
+            this->u_saturated = this->u_min;
+        } else {
+            this->u_saturated = this->u;
+        }
+
+        PWM_setPulse(&(this->PWM), this->u_saturated);
     } else
     {
         PWM_setPulse(&this->PWM, 0);
@@ -102,12 +95,20 @@ void FanController_setRefValue(FanController_t *this, uint16_t set_value)
     BBController_reset(&this->BB_controller);
     PID_reset(&this->PID_controller);
 
-    uint16_t hysteresis = this->BB_controller.threshold_top - this->BB_controller.threshold_bottom;
-    BBController_setParams(&this->BB_controller, set_value, hysteresis, 0);
-    this->PID_controller.set_value = set_value;
+    float hysteresis = this->BB_controller.threshold_top - this->BB_controller.threshold_bottom;
+    BBController_setParams(&this->BB_controller, hysteresis);
 }
 
 void FanController_setMode(FanController_t *this, OperationMode_t mode)
 {
     this->mode = mode;
+}
+
+void FanController_reset(FanController_t *this)
+{
+    this->u = 0;
+    this->u_saturated = 0;
+    BBController_reset(&this->BB_controller);
+    PID_reset(&this->PID_controller);
+    IIR_reset(&this->error);
 }

@@ -54,7 +54,7 @@ void ControlReference_update(ControlReference_t* this)
             this->ref_value = this->set_value;
             break;
         case RAMP:
-            uint16_t new_ramp_reference = this->ref_value + this->ramp->slope;
+            float new_ramp_reference = this->ref_value + this->ramp->slope;
             if(new_ramp_reference < this->set_value)
             {
                 this->ref_value = new_ramp_reference;
@@ -83,7 +83,7 @@ void ControlReference_setRampReference(ControlReference_t *this, uint16_t set_va
     this->type = RAMP;
     this->set_value = set_value;
     
-    this->ramp->slope = slope * ((float)this->sample_time / 1000.0f);
+    this->ramp->slope = (float)slope * ((float)this->sample_time / 1000.0f);
 
     this->time = 0;
     this->ref_value = 0;

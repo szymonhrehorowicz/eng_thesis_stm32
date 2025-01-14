@@ -17,17 +17,13 @@ typedef enum
 
 typedef struct
 {
-    uint16_t set_value;
-    uint16_t threshold_top;
-    uint16_t threshold_bottom;
-    uint16_t u_max;
-    uint16_t u_min;
+    float threshold_top;
+    float threshold_bottom;
     BBCommand_t command;
 } BBController_t;
 
-void BBController_update(BBController_t *this, uint16_t current_value);
-void BBController_setParams(BBController_t *this, uint16_t set_value,
-        uint16_t hysteresis, int16_t hysteresis_shift);
+BBCommand_t BBController_update(BBController_t *this, float error);
+void BBController_setParams(BBController_t *this, float hysteresis);
 void BBController_reset(BBController_t *this);
 
 #endif /* INC_CONTROL_BANG_BANG_H_ */

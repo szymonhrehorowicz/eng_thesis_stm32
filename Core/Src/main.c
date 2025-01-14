@@ -123,13 +123,6 @@ int main(void)
     while (1)
     {
         COM_checkConnection();
-
-        if(((HAL_GetTick() > lastMsgTimestamp) && (wasAlreadyReset == 0)))
-        {
-            FanController_setMode(&fanController, OFF);
-            CoilController_setMode(&coilController, OFF);
-            wasAlreadyReset = 1;
-        }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

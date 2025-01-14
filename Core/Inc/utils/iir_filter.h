@@ -12,10 +12,19 @@
 
 typedef struct
 {
-    float value;
-    float prev_value;
-    float b;   // coefficient
+    float value;      // y[n]
+    float p_value;    // y[n-1]
+    float pp_value;   // y[n-2]
+    float p_r_value;  // x[n-1]
+    float pp_r_value; // x[n-2]
+
     float sample_time; // ms
+    // Coefficients
+    double b0;
+    double b1;
+    double b2;
+    double a1;
+    double a2;
 } IIRfilter_t;
 
 void IIR_update(IIRfilter_t *this, float current_value);

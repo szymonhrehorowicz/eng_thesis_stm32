@@ -19,12 +19,12 @@ typedef enum
 
 typedef struct
 {
-    uint16_t slope;
+    float slope;
 } RampReference_t;
 
 typedef struct
 {
-    uint16_t amplitude;
+    float amplitude;
     float omega;
 } SinewaveReference_t;
 
@@ -33,8 +33,8 @@ typedef struct ControlReference
     uint16_t               sample_time;
     float                  time;
     ControlReferenceType_t type;
-    uint16_t               set_value;
-    uint16_t               ref_value;
+    float                  set_value;
+    float                  ref_value;
     RampReference_t        *ramp;
     SinewaveReference_t    *sinewave;
 } ControlReference_t;
