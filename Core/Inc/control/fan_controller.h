@@ -27,8 +27,8 @@ typedef struct
     PWMController_t PWM;
     OperationMode_t mode;
     ControlReference_t control_reference;
-    uint16_t u;
-    uint16_t u_saturated;
+    int16_t u;
+    int16_t u_saturated;
     uint16_t u_max;
     uint16_t u_min;
 } FanController_t;

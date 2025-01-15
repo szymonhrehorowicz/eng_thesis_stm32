@@ -409,13 +409,13 @@ void COM_translateMsg(uint8_t *msg, uint16_t len)
                 case RAMP:
                     ControlReference_setRampReference(
                         &coilController.control_reference,
-                        coil_mode == ON ? coil_set_value : 0,
+                        coil_mode == ON || coil_mode == COMBINED ? coil_set_value : 0,
                         cccc2u16(&msg[MSG_BODY + CTRL_REF_SLOPE]));
                     break;
                 case SINEWAVE:
                     ControlReference_setSineReference(
                         &coilController.control_reference,
-                        coil_mode == ON ? coil_set_value : 0,
+                        coil_mode == ON || coil_mode == COMBINED ? coil_set_value : 0,
                         cccc2u16(&msg[MSG_BODY + CTRL_REF_AMPL]),
                         ccc_cc2f(&msg[MSG_BODY + CTRL_REF_OMEGA]));
                     break;
@@ -436,6 +436,15 @@ void COM_translateMsg(uint8_t *msg, uint16_t len)
             CoilController_setRefCoil(&coilController, c2u8(msg[MSG_BODY + COIL_TYPE]));
             CoilController_setController(&coilController, c2u8(msg[MSG_BODY + CONTROLLER_TYPE]));
             CoilController_setMode(&coilController, coil_mode);
+            if(coil_mode == COMBINED)
+            {
+                FanController_reset(&fanController);
+                BBController_setParams(&(fanController.BB_controller), (float)cccc2u16(&msg[MSG_BODY + BB_HYSTERESIS]));
+                FanController_setMode(&fanController, COMBINED);
+            } else if(fanController.mode == COMBINED)
+            {
+                FanController_setMode(&fanController, OFF);
+            }
             break;
         default:
             break;

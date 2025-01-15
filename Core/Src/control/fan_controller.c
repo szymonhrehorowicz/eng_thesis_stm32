@@ -47,32 +47,51 @@ void FanController_update(FanController_t *this)
     // Filter the raw speed measurement
     IIR_update(&this->filter, this->speed);
     ControlReference_update(&(this->control_reference));
-    IIR_update(&this->error, this->control_reference.ref_value - this->filter.value);
 
+    if(this->mode == COMBINED)
+    {
+        return;
+    }
+    
     if (this->mode == ON)
     {
-        HAL_GPIO_WritePin(LED_COIL_GPIO_Port, LED_COIL_Pin, GPIO_PIN_SET);
+        HAL_GPIO_WritePin(LED_FAN_GPIO_Port, LED_FAN_Pin, GPIO_PIN_SET);
+        IIR_update(&this->error, this->control_reference.ref_value - this->filter.value);
+        uint8_t skip_saturation = 0;
 
         if (this->used_controller == PID)
         {
+            // PID
             this->u = PID_update(&this->PID_controller, this->error.value, this->u_saturated - this->u);
+        } else if(this->used_controller == BANG_BANG)
+        {
+            // BANG BANG
+            this->u = this->u_max * BBController_update(&this->BB_controller, this->error.value);
         } else
         {
-            this->u = this->u_max * BBController_update(&this->BB_controller, this->error.value);
+            // FORCED
+            this->u = 0.6 * (float)FAN_U_MAX;
+            skip_saturation = 1;
         }
 
-        if (this->u > this->u_max) {
-            this->u_saturated = this->u_max;
-        }
-        else if (this->u < this->u_min) {
-            this->u_saturated = this->u_min;
-        } else {
-            this->u_saturated = this->u;
-        }
+        if (skip_saturation == 0)
+        {
+            if (this->u > this->u_max) {
+                this->u_saturated = this->u_max;
+            } else if (this->u < this->u_min) {
+                this->u_saturated = this->u_min;
+            } else {
+                this->u_saturated = this->u;
+            }
+         } else
+         {
+             this->u_saturated = this->u;
+         }
 
         PWM_setPulse(&(this->PWM), this->u_saturated);
     } else
     {
+        IIR_update(&this->error, 0);
         PWM_setPulse(&this->PWM, 0);
         HAL_GPIO_WritePin(FAN_ON_GPIO_Port, FAN_ON_Pin, GPIO_PIN_RESET);
         HAL_GPIO_WritePin(LED_FAN_GPIO_Port, LED_FAN_Pin, GPIO_PIN_RESET);

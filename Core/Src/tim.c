@@ -23,6 +23,8 @@
 /* USER CODE BEGIN 0 */
 #include "control/fan_controller.h"
 #include "control/coil_controller.h"
+#include "control/combined_controller.h"
+#include "control/controller_enums.h"
 #include "communication.h"
 /* USER CODE END 0 */
 
@@ -49,9 +51,9 @@ void MX_TIM1_Init(void)
 
   /* USER CODE END TIM1_Init 1 */
   htim1.Instance = TIM1;
-  htim1.Init.Prescaler = 21-1;
+  htim1.Init.Prescaler = 2-1;
   htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim1.Init.Period = 160-1;
+  htim1.Init.Period = 1680-1;
   htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim1.Init.RepetitionCounter = 0;
   htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
@@ -560,6 +562,11 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     {
         CoilController_update(&coilController);
         FanController_update(&fanController);
+
+        if(coilController.mode == COMBINED)
+        {
+            CombinedController_update(&combinedController);
+        }
 
         COM_sendAllData();
     }

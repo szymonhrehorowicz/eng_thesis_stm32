@@ -26,7 +26,7 @@ typedef struct
     float u_d;
 } PID_t;
 
-uint16_t PID_update(PID_t *this, float error, int16_t control_difference);
+int16_t PID_update(PID_t *this, float error, int16_t control_difference);
 void PID_update_with_error_injection(PID_t *this, float error);
 void PID_reset(PID_t *this);
 

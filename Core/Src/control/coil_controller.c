@@ -63,24 +63,43 @@ void CoilController_update(CoilController_t *this)
         IIR_update(&this->filters[therm_id], this->temperatures[therm_id]);
     }
     ControlReference_update(&(this->control_reference));
-    IIR_update(&this->error, this->control_reference.ref_value - this->temperatures[this->ref_temp]);
+
+    // Overheat protection
+    if((this->temperatures[TEMP_TOP] >= MAX_TEMPERATURE) || (this->temperatures[TEMP_BOTTOM] >= MAX_TEMPERATURE))
+    {
+        PWM_setPulse(&(this->PWM[COIL_A]), 0);
+        PWM_setPulse(&(this->PWM[COIL_B]), 0);
+        HAL_GPIO_WritePin(LED_ERROR_GPIO_Port, LED_ERROR_Pin, GPIO_PIN_SET);
+        return;
+    } else
+    {
+        HAL_GPIO_WritePin(LED_ERROR_GPIO_Port, LED_ERROR_Pin, GPIO_PIN_RESET);
+    }
+
+    if(this->mode == COMBINED)
+    {
+        return;
+    }
 
     if (this->mode == ON)
     {
         HAL_GPIO_WritePin(LED_COIL_GPIO_Port, LED_COIL_Pin, GPIO_PIN_SET);
+        IIR_update(&this->error, this->control_reference.ref_value - this->temperatures[this->ref_temp]);
 
         if (this->used_controller == PID)
         {
             this->u = PID_update(&this->PID_controller, this->error.value, this->u_saturated - this->u);
-        } else
+        } else if(this->used_controller == BANG_BANG)
         {
             this->u = this->u_max * BBController_update(&this->BB_controller, this->error.value);
+        } else
+        {
+            this->u = this->u_max;
         }
 
         if (this->u > this->u_max) {
             this->u_saturated = this->u_max;
-        }
-        else if (this->u < this->u_min) {
+        } else if (this->u < this->u_min) {
             this->u_saturated = this->u_min;
         } else {
             this->u_saturated = this->u;
@@ -89,20 +108,10 @@ void CoilController_update(CoilController_t *this)
         PWM_setPulse(&(this->PWM[this->ref_coil]), this->u_saturated);
     } else
     {
+        IIR_update(&this->error, 0);
         PWM_setPulse(&(this->PWM[COIL_A]), 0);
         PWM_setPulse(&(this->PWM[COIL_B]), 0);
         HAL_GPIO_WritePin(LED_COIL_GPIO_Port, LED_COIL_Pin, GPIO_PIN_RESET);
-    }
-
-    // Overheat protection
-    if((this->temperatures[TEMP_TOP] >= MAX_TEMPERATURE) || (this->temperatures[TEMP_BOTTOM] >= MAX_TEMPERATURE))
-    {
-        PWM_setPulse(&(this->PWM[COIL_A]), 0);
-        PWM_setPulse(&(this->PWM[COIL_B]), 0);
-        HAL_GPIO_WritePin(LED_ERROR_GPIO_Port, LED_ERROR_Pin, GPIO_PIN_SET);
-    } else
-    {
-        HAL_GPIO_WritePin(LED_ERROR_GPIO_Port, LED_ERROR_Pin, GPIO_PIN_RESET);
     }
 }
 

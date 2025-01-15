@@ -21,7 +21,7 @@ typedef enum
 
 typedef enum
 {
-    PID, BANG_BANG,
+    PID, BANG_BANG, FORCED
 } UsedController_t;
 
 typedef enum
@@ -34,7 +34,7 @@ typedef enum
 #define MIN_TEMPERATURE 0    // deg C
 #define HEATER_U_MAX (1000-1)
 #define HEATER_U_MIN 0
-#define FAN_U_MAX (160-1)
-#define FAN_U_MIN (16-1)
+#define FAN_U_MAX (1680-1)
+#define FAN_U_MIN (168-1)
 
 #endif /* INC_CONTROL_CONTROLLER_ENUMS_H_ */

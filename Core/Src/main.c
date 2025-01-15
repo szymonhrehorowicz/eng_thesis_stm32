@@ -28,6 +28,7 @@
 /* USER CODE BEGIN Includes */
 #include "control/fan_controller.h"
 #include "control/coil_controller.h"
+#include "control/combined_controller.h"
 #include "control/control_reference.h"
 #include "communication.h"
 /* USER CODE END Includes */
@@ -102,6 +103,7 @@ int main(void)
     // Controllers init
     FanController_init(&fanController);
     CoilController_init(&coilController);
+    CombinedController_init(&combinedController, &fanController, &coilController);
     // Tachometer timer initialization
     HAL_TIM_IC_Start_IT(&htim3, TIM_CHANNEL_1);
     HAL_TIM_IC_Start(&htim3, TIM_CHANNEL_2);
