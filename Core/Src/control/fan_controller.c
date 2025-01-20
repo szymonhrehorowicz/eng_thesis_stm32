@@ -17,8 +17,8 @@ void FanController_init(FanController_t *this)
     this->mode = OFF;
 
     // Filter
-    this->filter.sample_time = SAMPLE_TIME_MS; // ms
-    IIR_setCutoffFreq(&this->filter, 1);
+    // this->filter.sample_time = SAMPLE_TIME_MS; // ms
+    // IIR_setCutoffFreq(&this->filter, 1);
 
     // BB controller
     BBController_reset(&this->BB_controller);
@@ -27,14 +27,15 @@ void FanController_init(FanController_t *this)
     // PID controller
     PID_reset(&this->PID_controller);
     this->PID_controller.sample_time = SAMPLE_TIME_MS;
-    this->error.sample_time = SAMPLE_TIME_MS;
-    IIR_setCutoffFreq(&this->error, 1);
+    this->error = 0;
     this->PID_controller.Kp = 0;
     this->PID_controller.Ki = 0;
     this->PID_controller.Kd = 0;
     this->PID_controller.Kaw = 0;
     this->u_max = FAN_U_MAX;
     this->u_min = FAN_U_MIN;
+    //this->PID_controller.u_d.sample_time = SAMPLE_TIME_MS;
+    //IIR_setCutoffFreq(&(this->PID_controller.u_d), 5);
 
     // PWM controller
     this->PWM.channel = TIM_CHANNEL_1;
@@ -56,17 +57,17 @@ void FanController_update(FanController_t *this)
     if (this->mode == ON)
     {
         HAL_GPIO_WritePin(LED_FAN_GPIO_Port, LED_FAN_Pin, GPIO_PIN_SET);
-        IIR_update(&this->error, this->control_reference.ref_value - this->filter.value);
+        this->error = this->control_reference.ref_value - this->filter.value;
         uint8_t skip_saturation = 0;
 
         if (this->used_controller == PID)
         {
             // PID
-            this->u = PID_update(&this->PID_controller, this->error.value, this->u_saturated - this->u);
+            this->u = PID_update(&this->PID_controller, this->error, this->u_saturated - this->u);
         } else if(this->used_controller == BANG_BANG)
         {
             // BANG BANG
-            this->u = this->u_max * BBController_update(&this->BB_controller, this->error.value);
+            this->u = this->u_max * BBController_update(&this->BB_controller, this->error);
         } else
         {
             // FORCED
@@ -91,7 +92,7 @@ void FanController_update(FanController_t *this)
         PWM_setPulse(&(this->PWM), this->u_saturated);
     } else
     {
-        IIR_update(&this->error, 0);
+        this->error = 0;
         PWM_setPulse(&this->PWM, 0);
         HAL_GPIO_WritePin(FAN_ON_GPIO_Port, FAN_ON_Pin, GPIO_PIN_RESET);
         HAL_GPIO_WritePin(LED_FAN_GPIO_Port, LED_FAN_Pin, GPIO_PIN_RESET);
@@ -129,5 +130,5 @@ void FanController_reset(FanController_t *this)
     this->u_saturated = 0;
     BBController_reset(&this->BB_controller);
     PID_reset(&this->PID_controller);
-    IIR_reset(&this->error);
+    this->error = 0;
 }

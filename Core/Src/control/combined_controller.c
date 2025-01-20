@@ -20,8 +20,8 @@ void CombinedController_init(CombinedController_t *this, FanController_t *p_fan,
 
 void CombinedController_update(CombinedController_t* this)
 {
-    IIR_update(&(this->p_coil->error), this->p_coil->control_reference.ref_value - this->p_coil->temperatures[this->p_coil->ref_temp]);
-    IIR_update(&(this->p_fan->error), -(this->p_coil->control_reference.ref_value - this->p_coil->temperatures[this->p_coil->ref_temp]));
+    this->p_coil->error = this->p_coil->control_reference.ref_value - this->p_coil->filters[this->p_coil->ref_temp].value;
+    this->p_fan->error = this->p_coil->error;
 
     HAL_GPIO_WritePin(LED_FAN_GPIO_Port, LED_FAN_Pin, GPIO_PIN_SET);
     HAL_GPIO_WritePin(LED_COIL_GPIO_Port, LED_COIL_Pin, GPIO_PIN_SET);
@@ -30,24 +30,24 @@ void CombinedController_update(CombinedController_t* this)
     if(this->p_coil->used_controller == PID)
     {
         this->p_coil->u = PID_update(&(this->p_coil->PID_controller),
-            this->p_coil->error.value,
+            this->p_coil->error,
             this->p_coil->u_saturated - this->p_coil->u);
     }else 
     {
         this->p_coil->u = this->p_coil->u_max * BBController_update(&(this->p_coil->BB_controller),
-            this->p_coil->error.value);
+            this->p_coil->error);
     }
 
     // Update set fan controller
     if(this->p_fan->used_controller == PID)
     {
         this->p_fan->u = PID_update(&(this->p_fan->PID_controller),
-            this->p_fan->error.value,
+            this->p_fan->error,
             this->p_fan->u_saturated - this->p_fan->u);
     }else 
     {
         this->p_fan->u = this->p_fan->u_max * BBController_update(&(this->p_fan->BB_controller),
-            this->p_fan->error.value);
+            this->p_fan->error);
     }
 
     // Saturate coil control signal

@@ -18,7 +18,7 @@
 
 typedef struct
 {
-    IIRfilter_t error;
+    float error;
     IIRfilter_t filter;
     uint16_t speed;
     PID_t PID_controller;

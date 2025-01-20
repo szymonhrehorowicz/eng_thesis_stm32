@@ -43,7 +43,7 @@ void ControlReference_init(ControlReference_t *fan_ref, ControlReference_t *coil
 void ControlReference_update(ControlReference_t* this);
 
 void ControlReference_setStepReference(ControlReference_t *this, uint16_t set_value);
-void ControlReference_setRampReference(ControlReference_t *this, uint16_t set_value, uint16_t slope /* unit/s */);
-void ControlReference_setSineReference(ControlReference_t *this, uint16_t set_value, uint16_t amplitude, float omega);
+void ControlReference_setRampReference(ControlReference_t *this, int16_t start_value, uint16_t set_value, uint16_t slope /* unit/s */);
+void ControlReference_setSineReference(ControlReference_t *this, int16_t start_value, uint16_t set_value, uint16_t amplitude, float omega);
 
 #endif /* INC_CONTROL_CONTROL_REFERENCE_H_ */

@@ -138,7 +138,7 @@ void COM_sendAllData(void)
     // Reference value
     float_to_bytes(msg, &msg_idx, &(fanController.control_reference.ref_value));
     // Error
-    float_to_bytes(msg, &msg_idx, &(fanController.error.value));
+    float_to_bytes(msg, &msg_idx, &(fanController.error));
 
     // Bang Bang
         // cmd
@@ -192,7 +192,7 @@ void COM_sendAllData(void)
     // Reference value
     float_to_bytes(msg, &msg_idx, &(coilController.control_reference.ref_value));
     // Error
-    float_to_bytes(msg, &msg_idx, &(coilController.error.value));
+    float_to_bytes(msg, &msg_idx, &(coilController.error));
     
     // Bang Bang
         // cmd
@@ -280,7 +280,7 @@ void COM_sendFastData(void)
 
     // PID
         // Error
-    float_to_bytes(msg, &msg_idx, &(fanController.error.value));
+    float_to_bytes(msg, &msg_idx, &(fanController.error));
         // Integral sum
     float_to_bytes(msg, &msg_idx, &(fanController.PID_controller.integral_sum));
         // Ant-windup integral sum
@@ -307,7 +307,7 @@ void COM_sendFastData(void)
 
     // PID
         // Error
-    float_to_bytes(msg, &msg_idx, &(coilController.error.value));
+    float_to_bytes(msg, &msg_idx, &(coilController.error));
         // Integral sum
     float_to_bytes(msg, &msg_idx, &(coilController.PID_controller.integral_sum));
         // Ant-windup integral sum
@@ -367,12 +367,14 @@ void COM_translateMsg(uint8_t *msg, uint16_t len)
                 case RAMP:
                     ControlReference_setRampReference(
                         &fanController.control_reference,
+                        fan_mode == ON ? fanController.filter.value : 0,
                         fan_mode == ON ? fan_set_value : 0,
                         cccc2u16(&msg[MSG_BODY + CTRL_REF_SLOPE]));
                     break;
                 case SINEWAVE:
                     ControlReference_setSineReference(
                         &fanController.control_reference,
+                        fan_mode == ON ? fanController.filter.value : 0,
                         fan_mode == ON ? fan_set_value : 0,
                         cccc2u16(&msg[MSG_BODY + CTRL_REF_AMPL]),
                         ccc_cc2f(&msg[MSG_BODY + CTRL_REF_OMEGA]));
@@ -409,12 +411,14 @@ void COM_translateMsg(uint8_t *msg, uint16_t len)
                 case RAMP:
                     ControlReference_setRampReference(
                         &coilController.control_reference,
+                        coil_mode == ON || coil_mode == COMBINED ? coilController.filters[coilController.ref_temp].value : 0,
                         coil_mode == ON || coil_mode == COMBINED ? coil_set_value : 0,
                         cccc2u16(&msg[MSG_BODY + CTRL_REF_SLOPE]));
                     break;
                 case SINEWAVE:
                     ControlReference_setSineReference(
                         &coilController.control_reference,
+                        coil_mode == ON || coil_mode == COMBINED ? coilController.filters[coilController.ref_temp].value : 0,
                         coil_mode == ON || coil_mode == COMBINED ? coil_set_value : 0,
                         cccc2u16(&msg[MSG_BODY + CTRL_REF_AMPL]),
                         ccc_cc2f(&msg[MSG_BODY + CTRL_REF_OMEGA]));

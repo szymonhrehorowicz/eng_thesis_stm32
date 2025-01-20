@@ -61,8 +61,8 @@ void ControlReference_update(ControlReference_t* this)
             }
             break;
         case SINEWAVE:
-            int new_sine_reference = (int)this->set_value + (int)(((double)this->sinewave->amplitude * sin(this->sinewave->omega * this->time)));
-            this->ref_value = new_sine_reference > 0.0f ? (uint16_t)new_sine_reference : 0;
+            float new_sine_reference = (float)this->set_value + (float)(((double)this->sinewave->amplitude * sin(this->sinewave->omega * this->time)));
+            this->ref_value = new_sine_reference > 0.0f ? new_sine_reference : 0;
             break;
         default:
             break;
@@ -78,7 +78,7 @@ void ControlReference_setStepReference(ControlReference_t *this, uint16_t set_va
     this->ref_value = set_value;
 }
 
-void ControlReference_setRampReference(ControlReference_t *this, uint16_t set_value, uint16_t slope /* unit/s */)
+void ControlReference_setRampReference(ControlReference_t *this, int16_t start_value, uint16_t set_value, uint16_t slope /* unit/s */)
 {
     this->type = RAMP;
     this->set_value = set_value;
@@ -86,10 +86,10 @@ void ControlReference_setRampReference(ControlReference_t *this, uint16_t set_va
     this->ramp->slope = (float)slope * ((float)this->sample_time / 1000.0f);
 
     this->time = 0;
-    this->ref_value = 0;
+    this->ref_value = start_value;
 }
 
-void ControlReference_setSineReference(ControlReference_t *this, uint16_t set_value, uint16_t amplitude, float omega)
+void ControlReference_setSineReference(ControlReference_t *this, int16_t start_value, uint16_t set_value, uint16_t amplitude, float omega)
 {
     this->type = SINEWAVE;
     this->set_value = set_value;
@@ -98,5 +98,5 @@ void ControlReference_setSineReference(ControlReference_t *this, uint16_t set_va
     this->sinewave->omega = set_value != 0 ? omega : 0.0f;
 
     this->time = 0;
-    this->ref_value = 0;
+    this->ref_value = start_value;
 }

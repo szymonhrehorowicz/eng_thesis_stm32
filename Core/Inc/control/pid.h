@@ -24,6 +24,7 @@ typedef struct
     float u_p;
     float u_i;
     float u_d;
+    IIRfilter_t error_difference;
 } PID_t;
 
 int16_t PID_update(PID_t *this, float error, int16_t control_difference);

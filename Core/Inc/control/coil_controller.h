@@ -20,7 +20,7 @@
 
 typedef struct
 {
-    IIRfilter_t error;
+    float error;
     IIRfilter_t filters[NUMBER_OF_THERMISTORS];
     float temperatures[NUMBER_OF_THERMISTORS];
     uint16_t raw_voltages[NUMBER_OF_THERMISTORS];
