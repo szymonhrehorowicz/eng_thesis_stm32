@@ -59,9 +59,9 @@ typedef enum
     CTRL_REF_SLOPE  = CTRL_REF_TYPE + 1,
     CTRL_REF_AMPL   = CTRL_REF_SLOPE + 4,
     CTRL_REF_OMEGA  = CTRL_REF_AMPL + 4,
-    COIL_TYPE       = CTRL_REF_OMEGA + 6, // 0/1
+    POWER           = CTRL_REF_OMEGA + 6, // 0-100
+    COIL_TYPE       = POWER + 3, // 0/1
     LEFT_RIGHT      = COIL_TYPE + 1, // 0/1
-    COIL_POWER      = LEFT_RIGHT + 1, // 0-100
 } ConfMsgBody_t;
 
 
@@ -391,6 +391,13 @@ void COM_translateMsg(uint8_t *msg, uint16_t len)
             fanController.PID_controller.Kd = ccc_cc2f(&msg[MSG_BODY + PID_KD]);
             fanController.PID_controller.Kaw = ccc_cc2f(&msg[MSG_BODY + PID_KAW]);
             // COMMON
+            if(c2u8(msg[MSG_BODY + CONTROLLER_TYPE]) != FORCED)
+            {
+                fanController.u_max = FAN_U_MAX;
+            }else
+            {
+                fanController.u_max = (uint16_t)(((float)FAN_U_MAX - (float)FAN_U_MIN) * ((float)ccc2u8(&msg[MSG_BODY + POWER])/100.0f) + (float)FAN_U_MIN);
+            }
             FanController_setController(&fanController, c2u8(msg[MSG_BODY + CONTROLLER_TYPE]));
             FanController_setMode(&fanController, fan_mode);    
             break;
@@ -429,7 +436,6 @@ void COM_translateMsg(uint8_t *msg, uint16_t len)
             CoilController_reset(&coilController);
             // BANG BANG
             BBController_setParams(&(coilController.BB_controller), (float)cccc2u16(&msg[MSG_BODY + BB_HYSTERESIS]));
-            coilController.u_max = (uint16_t)((float)HEATER_U_MAX * ((float)ccc2u8(&msg[MSG_BODY + COIL_POWER])/100.0f));
             // PID
             coilController.PID_controller.Kp = ccc_cc2f(&msg[MSG_BODY + PID_KP]);
             coilController.PID_controller.Ki = ccc_cc2f(&msg[MSG_BODY + PID_KI]);
@@ -440,7 +446,10 @@ void COM_translateMsg(uint8_t *msg, uint16_t len)
             CoilController_setRefCoil(&coilController, c2u8(msg[MSG_BODY + COIL_TYPE]));
             CoilController_setController(&coilController, c2u8(msg[MSG_BODY + CONTROLLER_TYPE]));
             CoilController_setMode(&coilController, coil_mode);
-            if(coil_mode == COMBINED)
+            
+            coilController.u_max = (uint16_t)((float)HEATER_U_MAX * ((float)ccc2u8(&msg[MSG_BODY + POWER])/100.0f));
+
+            if(coil_mode == FORCED)
             {
                 FanController_reset(&fanController);
                 BBController_setParams(&(fanController.BB_controller), (float)cccc2u16(&msg[MSG_BODY + BB_HYSTERESIS]));

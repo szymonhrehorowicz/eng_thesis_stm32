@@ -71,7 +71,7 @@ void FanController_update(FanController_t *this)
         } else
         {
             // FORCED
-            this->u = 0.6 * (float)FAN_U_MAX;
+            this->u = this->u_max;
             skip_saturation = 1;
         }
 
