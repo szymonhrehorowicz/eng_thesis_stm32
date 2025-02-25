@@ -447,7 +447,7 @@ void COM_translateMsg(uint8_t *msg, uint16_t len)
             CoilController_setController(&coilController, c2u8(msg[MSG_BODY + CONTROLLER_TYPE]));
             CoilController_setMode(&coilController, coil_mode);
             
-            coilController.u_max = (uint16_t)((float)HEATER_U_MAX * ((float)ccc2u8(&msg[MSG_BODY + POWER])/100.0f));
+            coilController.u_max = (uint16_t)((float)HEATER_U_MAX * ((float)ccc2u8(&msg[MSG_BODY + POWER])/120.0f));
 
             if(coil_mode == FORCED)
             {
