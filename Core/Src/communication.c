@@ -168,11 +168,9 @@ void COM_sendAllData(void)
         // Kaw
     float_to_bytes(msg, &msg_idx, &(fanController.PID_controller.Kaw));
         // u
-    msg[msg_idx] = (uint8_t)(fanController.u >> 8); msg_idx++;
-    msg[msg_idx] = (uint8_t)(fanController.u & 0x00ff); msg_idx++;
+    float_to_bytes(msg, &msg_idx, &(fanController.u));
         // u_sat
-    msg[msg_idx] = (uint8_t)(fanController.u_saturated >> 8); msg_idx++;
-    msg[msg_idx] = (uint8_t)(fanController.u_saturated & 0x00ff); msg_idx++;
+    float_to_bytes(msg, &msg_idx, &(fanController.u_saturated));
         // u_p
     float_to_bytes(msg, &msg_idx, &(fanController.PID_controller.u_p));
         // u_i
@@ -223,11 +221,9 @@ void COM_sendAllData(void)
         // Kaw
     float_to_bytes(msg, &msg_idx, &(coilController.PID_controller.Kaw));
         // u
-    msg[msg_idx] = (uint8_t)(coilController.u >> 8); msg_idx++;
-    msg[msg_idx] = (uint8_t)(coilController.u & 0x00ff); msg_idx++;
+    float_to_bytes(msg, &msg_idx, &(coilController.u));
         // u_sat
-    msg[msg_idx] = (uint8_t)(coilController.u_saturated >> 8); msg_idx++;
-    msg[msg_idx] = (uint8_t)(coilController.u_saturated & 0x00ff); msg_idx++;
+    float_to_bytes(msg, &msg_idx, &(coilController.u_saturated));
         // u_p
     float_to_bytes(msg, &msg_idx, &(coilController.PID_controller.u_p));
         // u_i
@@ -286,11 +282,9 @@ void COM_sendFastData(void)
         // Ant-windup integral sum
     float_to_bytes(msg, &msg_idx, &(fanController.PID_controller.aw_integral_sum));
         // u
-    msg[msg_idx] = (uint8_t)(fanController.u >> 8); msg_idx++;
-    msg[msg_idx] = (uint8_t)(fanController.u & 0x00ff); msg_idx++;
+    float_to_bytes(msg, &msg_idx, &(fanController.u));
         // u_sat
-    msg[msg_idx] = (uint8_t)(fanController.u_saturated >> 8); msg_idx++;
-    msg[msg_idx] = (uint8_t)(fanController.u_saturated & 0x00ff); msg_idx++;
+    float_to_bytes(msg, &msg_idx, &(fanController.u_saturated));
         // u_p
     float_to_bytes(msg, &msg_idx, &(fanController.PID_controller.u_p));
         // u_i
@@ -313,11 +307,9 @@ void COM_sendFastData(void)
         // Ant-windup integral sum
     float_to_bytes(msg, &msg_idx, &(coilController.PID_controller.aw_integral_sum));
         // u
-    msg[msg_idx] = (uint8_t)(coilController.u >> 8); msg_idx++;
-    msg[msg_idx] = (uint8_t)(coilController.u & 0x00ff); msg_idx++;
+    float_to_bytes(msg, &msg_idx, &(coilController.u));
         // u_sat
-    msg[msg_idx] = (uint8_t)(coilController.u_saturated >> 8); msg_idx++;
-    msg[msg_idx] = (uint8_t)(coilController.u_saturated & 0x00ff); msg_idx++;
+    float_to_bytes(msg, &msg_idx, &(coilController.u_saturated));
         // u_p
     float_to_bytes(msg, &msg_idx, &(coilController.PID_controller.u_p));
         // u_i

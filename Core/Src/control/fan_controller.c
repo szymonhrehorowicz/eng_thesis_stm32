@@ -86,7 +86,7 @@ void FanController_update(FanController_t *this)
             }
          } else
          {
-             this->u_saturated = this->u;
+            this->u_saturated = this->u;
          }
 
         PWM_setPulse(&(this->PWM), this->u_saturated);

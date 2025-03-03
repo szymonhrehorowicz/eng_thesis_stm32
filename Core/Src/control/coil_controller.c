@@ -94,7 +94,7 @@ void CoilController_update(CoilController_t *this)
 
         if (this->used_controller == PID)
         {
-            this->u = PID_update(&this->PID_controller, this->error, this->u_saturated - this->u);
+            this->u = PID_update(&this->PID_controller, this->error, (this->u_saturated * 12.0f / 1000.0f) - this->u);
         } else if(this->used_controller == BANG_BANG)
         {
             this->u = this->u_max * BBController_update(&this->BB_controller, this->error);
@@ -103,12 +103,14 @@ void CoilController_update(CoilController_t *this)
             this->u = this->u_max;
         }
 
-        if (this->u > this->u_max) {
+        uint16_t u_transformed = this->u / 12.0f * 1000.0f;
+
+        if (u_transformed > this->u_max) {
             this->u_saturated = this->u_max;
-        } else if (this->u < this->u_min) {
+        } else if (u_transformed < this->u_min) {
             this->u_saturated = this->u_min;
         } else {
-            this->u_saturated = this->u;
+            this->u_saturated = u_transformed;
         }
 
         PWM_setPulse(&(this->PWM[this->ref_coil]), this->u_saturated);
