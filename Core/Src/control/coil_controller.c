@@ -6,6 +6,7 @@
  */
 
 #include "control/coil_controller.h"
+#include "control/controller_enums.h"
 #include "measurements/temperature.h"
 
 CoilController_t coilController;
@@ -32,6 +33,16 @@ void CoilController_init(CoilController_t *self)
     //     IIR_setCutoffFreq(&(self->filters[filter_id]), 1);
     // }
 
+    for (int i = 0; i <= FILTER_ORDER; ++i)
+    {
+        self->filters[TEMP_TOP].x[i] = 0.0;
+        self->filters[TEMP_TOP].y[i] = 0.0;
+        self->filters[TEMP_BOTTOM].x[i] = 0.0;
+        self->filters[TEMP_BOTTOM].y[i] = 0.0;
+    }
+    self->filters[TEMP_TOP].value = 0.0;
+    self->filters[TEMP_BOTTOM].value = 0.0;
+
     // BB controller
     BBController_reset(&self->BB_controller);
     BBController_setParams(&self->BB_controller, 0.0f);
@@ -46,6 +57,8 @@ void CoilController_init(CoilController_t *self)
     self->PID_controller.Kaw = 0;
     self->u_max = HEATER_U_MAX;
     self->u_min = HEATER_U_MIN;
+    self->u = 0;
+    self->u_saturated = 0;
     // self->PID_controller.error_difference.sample_time = SAMPLE_TIME_MS;
     // IIR_setCutoffFreq(&(self->PID_controller.error_difference), 5);
 

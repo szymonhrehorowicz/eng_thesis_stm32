@@ -5,12 +5,14 @@
 TIM_HandleTypeDef htim1 = {};
 TIM_HandleTypeDef htim5 = {};
 
+uint32_t pwm_pulse = 0;
+
 int HAL_GPIO_WritePin(int, int, int)
 {
     return 0;
 }
 
-void PWM_setPulse(PWMController_t *, uint16_t)
+void PWM_setPulse(PWMController_t *, uint16_t pulse)
 {
-    return;
+    pwm_pulse = pulse;
 }

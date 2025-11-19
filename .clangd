@@ -1,0 +1,17 @@
+CompileFlags:
+  Add: [-std=c++23,
+        "-I", "C:/_git/Codebase/software",
+        "-I", "C:/_git/Codebase/software/operation",
+        "-I", "C:/_git/Codebase/firmware",
+        "-I", "C:/_git/Codebase/external/active_lib/incl",
+        "-I", "C:/_git/Codebase/external/etl/include"]
+  CompilationDatabase: build
+Diagnostics:
+  ClangTidy:
+    Remove: [modernize-*]
+
+Index:
+  Background: Build
+
+InlayHints:
+  Enabled: true

@@ -21,7 +21,7 @@
         "CMAKE_C_STANDARD_REQUIRED": "YES",
         "CMAKE_C_EXTENSIONS": "NO"
       },
-      "binaryDir": "build"
+      "binaryDir": "../../build"
     },
     {
       "name": "base-unit-tests-windows",

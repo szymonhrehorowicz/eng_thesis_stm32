@@ -16,7 +16,6 @@
 #include "tim.h"
 #include "utils/iir_filter.h"
 
-
 #define NUMBER_OF_THERMISTORS 2u
 
 typedef struct

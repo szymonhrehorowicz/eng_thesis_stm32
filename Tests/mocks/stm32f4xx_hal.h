@@ -1,12 +1,15 @@
 #if !defined(HAL_MOCK)
 #define HAL_MOCK
 
+#include "stdint.h"
+
 typedef struct
 {
 } TIM_HandleTypeDef;
 
 extern TIM_HandleTypeDef htim1;
 extern TIM_HandleTypeDef htim5;
+extern uint32_t pwm_pulse;
 
 #define GPIOA 0
 #define GPIOB 1
