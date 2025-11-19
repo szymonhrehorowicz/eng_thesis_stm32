@@ -44,59 +44,63 @@ void ControlReference_init(ControlReference_t *fan_ref, ControlReference_t *coil
     coilSineReference.omega = 0;
 }
 
-void ControlReference_update(ControlReference_t* this)
+void ControlReference_update(ControlReference_t *self)
 {
-    this->time += (float)this->sample_time/1000.0f;
+    self->time += (float)self->sample_time / 1000.0f;
 
-    switch(this->type)
+    switch (self->type)
     {
-        case STEP:
-            this->ref_value = this->set_value;
-            break;
-        case RAMP:
-            float new_ramp_reference = this->ref_value + this->ramp->slope;
-            if(new_ramp_reference < this->set_value)
-            {
-                this->ref_value = new_ramp_reference;
-            }
-            break;
-        case SINEWAVE:
-            float new_sine_reference = (float)this->set_value + (float)(((double)this->sinewave->amplitude * sin(this->sinewave->omega * this->time)));
-            this->ref_value = new_sine_reference > 0.0f ? new_sine_reference : 0;
-            break;
-        default:
-            break;
+    case STEP:
+        self->ref_value = self->set_value;
+        break;
+    case RAMP:
+        float new_ramp_reference = self->ref_value + self->ramp->slope;
+        if (new_ramp_reference < self->set_value)
+        {
+            self->ref_value = new_ramp_reference;
+        }
+        break;
+    case SINEWAVE:
+        float new_sine_reference =
+            (float)self->set_value +
+            (float)(((double)self->sinewave->amplitude * sin(self->sinewave->omega * self->time)));
+        self->ref_value = new_sine_reference > 0.0f ? new_sine_reference : 0;
+        break;
+    default:
+        break;
     }
 }
 
-void ControlReference_setStepReference(ControlReference_t *this, uint16_t set_value)
+void ControlReference_setStepReference(ControlReference_t *self, uint16_t set_value)
 {
-    this->type = STEP;
-    this->set_value = set_value;
+    self->type = STEP;
+    self->set_value = set_value;
 
-    this->time = 0;
-    this->ref_value = set_value;
+    self->time = 0;
+    self->ref_value = set_value;
 }
 
-void ControlReference_setRampReference(ControlReference_t *this, int16_t start_value, uint16_t set_value, uint16_t slope /* unit/s */)
+void ControlReference_setRampReference(ControlReference_t *self, int16_t start_value, uint16_t set_value,
+                                       uint16_t slope /* unit/s */)
 {
-    this->type = RAMP;
-    this->set_value = set_value;
-    
-    this->ramp->slope = (float)slope * ((float)this->sample_time / 1000.0f);
+    self->type = RAMP;
+    self->set_value = set_value;
 
-    this->time = 0;
-    this->ref_value = start_value;
+    self->ramp->slope = (float)slope * ((float)self->sample_time / 1000.0f);
+
+    self->time = 0;
+    self->ref_value = start_value;
 }
 
-void ControlReference_setSineReference(ControlReference_t *this, int16_t start_value, uint16_t set_value, uint16_t amplitude, float omega)
+void ControlReference_setSineReference(ControlReference_t *self, int16_t start_value, uint16_t set_value,
+                                       uint16_t amplitude, float omega)
 {
-    this->type = SINEWAVE;
-    this->set_value = set_value;
-    
-    this->sinewave->amplitude = set_value != 0 ? amplitude : 0;
-    this->sinewave->omega = set_value != 0 ? omega : 0.0f;
+    self->type = SINEWAVE;
+    self->set_value = set_value;
 
-    this->time = 0;
-    this->ref_value = start_value;
+    self->sinewave->amplitude = set_value != 0 ? amplitude : 0;
+    self->sinewave->omega = set_value != 0 ? omega : 0.0f;
+
+    self->time = 0;
+    self->ref_value = start_value;
 }

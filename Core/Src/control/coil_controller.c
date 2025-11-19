@@ -10,69 +10,69 @@
 
 CoilController_t coilController;
 
-void CoilController_init(CoilController_t *this)
+void CoilController_init(CoilController_t *self)
 {
     // Operation
-    this->mode = OFF;
-    this->ref_temp = TEMP_TOP;
-    this->ref_coil = COIL_A;
+    self->mode = OFF;
+    self->ref_temp = TEMP_TOP;
+    self->ref_coil = COIL_A;
 
     // TEMP
-    this->used_controller = BANG_BANG;
+    self->used_controller = BANG_BANG;
 
     // Filters
     // for(uint8_t filter_id = 0; filter_id < NUMBER_OF_THERMISTORS; ++filter_id)
     // {
-    //     this->filters[filter_id].sample_time = SAMPLE_TIME_MS;
-    //     this->filters[filter_id].p_value = 22.0f;
-    //     this->filters[filter_id].pp_value = 22.0f;
-    //     this->filters[filter_id].p_r_value = 22.0f;
-    //     this->filters[filter_id].pp_r_value = 22.0f;
-    //     this->filters[filter_id].value = 22.0f;
-    //     IIR_setCutoffFreq(&(this->filters[filter_id]), 1);
+    //     self->filters[filter_id].sample_time = SAMPLE_TIME_MS;
+    //     self->filters[filter_id].p_value = 22.0f;
+    //     self->filters[filter_id].pp_value = 22.0f;
+    //     self->filters[filter_id].p_r_value = 22.0f;
+    //     self->filters[filter_id].pp_r_value = 22.0f;
+    //     self->filters[filter_id].value = 22.0f;
+    //     IIR_setCutoffFreq(&(self->filters[filter_id]), 1);
     // }
 
     // BB controller
-    BBController_reset(&this->BB_controller);
-    BBController_setParams(&this->BB_controller, 0.0f);
+    BBController_reset(&self->BB_controller);
+    BBController_setParams(&self->BB_controller, 0.0f);
 
     // PID controller
-    PID_reset(&this->PID_controller);
-    this->PID_controller.sample_time = SAMPLE_TIME_MS;
-    this->error = 0;
-    this->PID_controller.Kp = 0;
-    this->PID_controller.Ki = 0;
-    this->PID_controller.Kd = 0;
-    this->PID_controller.Kaw = 0;
-    this->u_max = HEATER_U_MAX;
-    this->u_min = HEATER_U_MIN;
-    // this->PID_controller.error_difference.sample_time = SAMPLE_TIME_MS;
-    // IIR_setCutoffFreq(&(this->PID_controller.error_difference), 5);
+    PID_reset(&self->PID_controller);
+    self->PID_controller.sample_time = SAMPLE_TIME_MS;
+    self->error = 0;
+    self->PID_controller.Kp = 0;
+    self->PID_controller.Ki = 0;
+    self->PID_controller.Kd = 0;
+    self->PID_controller.Kaw = 0;
+    self->u_max = HEATER_U_MAX;
+    self->u_min = HEATER_U_MIN;
+    // self->PID_controller.error_difference.sample_time = SAMPLE_TIME_MS;
+    // IIR_setCutoffFreq(&(self->PID_controller.error_difference), 5);
 
     // PWM controllers
-    this->PWM[COIL_A].channel = TIM_CHANNEL_3;
-    this->PWM[COIL_B].channel = TIM_CHANNEL_4;
-    this->PWM[COIL_A].handle = &htim5;
-    this->PWM[COIL_B].handle = &htim5;
-    PWM_setPulse(&(this->PWM[COIL_A]), 0);
-    PWM_setPulse(&(this->PWM[COIL_B]), 0);
+    self->PWM[COIL_A].channel = TIM_CHANNEL_3;
+    self->PWM[COIL_B].channel = TIM_CHANNEL_4;
+    self->PWM[COIL_A].handle = &htim5;
+    self->PWM[COIL_B].handle = &htim5;
+    PWM_setPulse(&(self->PWM[COIL_A]), 0);
+    PWM_setPulse(&(self->PWM[COIL_B]), 0);
 }
 
-void CoilController_update(CoilController_t *this)
+void CoilController_update(CoilController_t *self)
 {
     // Calculate temperatures
     for (RefTemperature_t therm_id = 0; therm_id < NUMBER_OF_THERMISTORS; ++therm_id)
     {
-        this->temperatures[therm_id] = NTC_ADC2Temperature(this->raw_voltages[therm_id]);
-        IIR_update(&this->filters[therm_id], this->temperatures[therm_id]);
+        self->temperatures[therm_id] = NTC_ADC2Temperature(self->raw_voltages[therm_id]);
+        IIR_update(&self->filters[therm_id], self->temperatures[therm_id]);
     }
-    ControlReference_update(&(this->control_reference));
+    ControlReference_update(&(self->control_reference));
 
     // Overheat protection
-    if ((this->temperatures[TEMP_TOP] >= MAX_TEMPERATURE) || (this->temperatures[TEMP_BOTTOM] >= MAX_TEMPERATURE))
+    if ((self->temperatures[TEMP_TOP] >= MAX_TEMPERATURE) || (self->temperatures[TEMP_BOTTOM] >= MAX_TEMPERATURE))
     {
-        PWM_setPulse(&(this->PWM[COIL_A]), 0);
-        PWM_setPulse(&(this->PWM[COIL_B]), 0);
+        PWM_setPulse(&(self->PWM[COIL_A]), 0);
+        PWM_setPulse(&(self->PWM[COIL_B]), 0);
         HAL_GPIO_WritePin(LED_ERROR_GPIO_Port, LED_ERROR_Pin, GPIO_PIN_SET);
         return;
     }
@@ -81,104 +81,104 @@ void CoilController_update(CoilController_t *this)
         HAL_GPIO_WritePin(LED_ERROR_GPIO_Port, LED_ERROR_Pin, GPIO_PIN_RESET);
     }
 
-    if (this->mode == COMBINED)
+    if (self->mode == COMBINED)
     {
         return;
     }
 
-    if (this->mode == ON)
+    if (self->mode == ON)
     {
         HAL_GPIO_WritePin(LED_COIL_GPIO_Port, LED_COIL_Pin, GPIO_PIN_SET);
-        this->error = this->control_reference.ref_value - this->filters[this->ref_temp].value;
+        self->error = self->control_reference.ref_value - self->filters[self->ref_temp].value;
 
-        if (this->used_controller == PID)
+        if (self->used_controller == PID)
         {
-            this->u = PID_update(&this->PID_controller, this->error, (this->u_saturated / 12.0f * 1000.0f) - this->u);
+            self->u = PID_update(&self->PID_controller, self->error, (self->u_saturated / 12.0f * 1000.0f) - self->u);
         }
-        else if (this->used_controller == BANG_BANG)
+        else if (self->used_controller == BANG_BANG)
         {
-            this->u = this->u_max * BBController_update(&this->BB_controller, this->error);
+            self->u = self->u_max * BBController_update(&self->BB_controller, self->error);
         }
         else
         {
-            this->u = this->u_max;
+            self->u = self->u_max;
         }
 
-        uint16_t u_transformed = this->u / 12.0f * 1000.0f;
+        uint16_t u_transformed = self->u / 12.0f * 1000.0f;
 
-        if (u_transformed > this->u_max)
+        if (u_transformed > self->u_max)
         {
-            this->u_saturated = (float)this->u_max * 12.0f / 1000.0f;
-            u_transformed = this->u_max;
+            self->u_saturated = (float)self->u_max * 12.0f / 1000.0f;
+            u_transformed = self->u_max;
         }
-        else if (u_transformed < this->u_min)
+        else if (u_transformed < self->u_min)
         {
-            this->u_saturated = (float)this->u_min * 12.0f / 1000.0f;
-            u_transformed = this->u_min;
+            self->u_saturated = (float)self->u_min * 12.0f / 1000.0f;
+            u_transformed = self->u_min;
         }
         else
         {
-            this->u_saturated = this->u;
+            self->u_saturated = self->u;
         }
 
-        PWM_setPulse(&(this->PWM[this->ref_coil]), u_transformed);
+        PWM_setPulse(&(self->PWM[self->ref_coil]), u_transformed);
     }
     else
     {
-        this->error = 0;
-        PWM_setPulse(&(this->PWM[COIL_A]), 0);
-        PWM_setPulse(&(this->PWM[COIL_B]), 0);
+        self->error = 0;
+        PWM_setPulse(&(self->PWM[COIL_A]), 0);
+        PWM_setPulse(&(self->PWM[COIL_B]), 0);
         HAL_GPIO_WritePin(LED_COIL_GPIO_Port, LED_COIL_Pin, GPIO_PIN_RESET);
     }
 }
 
-void CoilController_setFilters(CoilController_t *this, uint16_t cutoff_freq)
+void CoilController_setFilters(CoilController_t *self, uint16_t cutoff_freq)
 {
     for (RefTemperature_t therm_id = 0; therm_id < NUMBER_OF_THERMISTORS; ++therm_id)
     {
-        IIR_setCutoffFreq(&(this->filters[therm_id]), cutoff_freq);
+        IIR_setCutoffFreq(&(self->filters[therm_id]), cutoff_freq);
     }
 }
 
-void CoilController_setController(CoilController_t *this, UsedController_t controller)
+void CoilController_setController(CoilController_t *self, UsedController_t controller)
 {
-    // BBController_reset(&this->BB_controller);
-    // PID_reset(&this->PID_controller);
+    // BBController_reset(&self->BB_controller);
+    // PID_reset(&self->PID_controller);
 
-    this->used_controller = controller;
+    self->used_controller = controller;
 }
 
-void CoilController_setRefTemp(CoilController_t *this, RefTemperature_t ref_temp)
+void CoilController_setRefTemp(CoilController_t *self, RefTemperature_t ref_temp)
 {
-    PWM_setPulse(&(this->PWM[TEMP_TOP]), 0);
-    PWM_setPulse(&(this->PWM[TEMP_BOTTOM]), 0);
-    this->ref_temp = ref_temp;
+    PWM_setPulse(&(self->PWM[TEMP_TOP]), 0);
+    PWM_setPulse(&(self->PWM[TEMP_BOTTOM]), 0);
+    self->ref_temp = ref_temp;
 }
 
-void CoilController_setRefValue(CoilController_t *this, uint16_t set_value)
+void CoilController_setRefValue(CoilController_t *self, uint16_t set_value)
 {
-    // BBController_reset(&this->BB_controller);
-    // PID_reset(&this->PID_controller);
+    // BBController_reset(&self->BB_controller);
+    // PID_reset(&self->PID_controller);
 
-    float hysteresis = this->BB_controller.threshold_top - this->BB_controller.threshold_bottom;
-    BBController_setParams(&this->BB_controller, hysteresis);
+    float hysteresis = self->BB_controller.threshold_top - self->BB_controller.threshold_bottom;
+    BBController_setParams(&self->BB_controller, hysteresis);
 }
 
-void CoilController_setRefCoil(CoilController_t *this, RefCoil_t coil)
+void CoilController_setRefCoil(CoilController_t *self, RefCoil_t coil)
 {
-    this->ref_coil = coil;
+    self->ref_coil = coil;
 }
 
-void CoilController_setMode(CoilController_t *this, OperationMode_t mode)
+void CoilController_setMode(CoilController_t *self, OperationMode_t mode)
 {
-    this->mode = mode;
+    self->mode = mode;
 }
 
-void CoilController_reset(CoilController_t *this)
+void CoilController_reset(CoilController_t *self)
 {
-    this->u = 0;
-    this->u_saturated = 0;
-    BBController_reset(&this->BB_controller);
-    PID_reset(&this->PID_controller);
-    this->error = 0;
+    self->u = 0;
+    self->u_saturated = 0;
+    BBController_reset(&self->BB_controller);
+    PID_reset(&self->PID_controller);
+    self->error = 0;
 }

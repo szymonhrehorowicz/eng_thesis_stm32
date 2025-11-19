@@ -18,8 +18,8 @@ typedef struct
     double y[FILTER_ORDER + 1];
 } IIRfilter_t;
 
-void IIR_update(IIRfilter_t *this, float current_value);
-void IIR_setCutoffFreq(IIRfilter_t *this, double freq);
-void IIR_reset(IIRfilter_t *this);
+void IIR_update(IIRfilter_t *self, float current_value);
+void IIR_setCutoffFreq(IIRfilter_t *self, double freq);
+void IIR_reset(IIRfilter_t *self);
 
 #endif /* INC_UTILS_IIR_FILTER_H_ */

@@ -12,64 +12,72 @@
 
 CombinedController_t combinedController;
 
-void CombinedController_init(CombinedController_t *this, FanController_t *p_fan, CoilController_t *p_coil)
+void CombinedController_init(CombinedController_t *self, FanController_t *p_fan, CoilController_t *p_coil)
 {
-    this->p_fan = p_fan;
-    this->p_coil = p_coil;
+    self->p_fan = p_fan;
+    self->p_coil = p_coil;
 }
 
-void CombinedController_update(CombinedController_t* this)
+void CombinedController_update(CombinedController_t *self)
 {
-    this->p_coil->error = this->p_coil->control_reference.ref_value - this->p_coil->filters[this->p_coil->ref_temp].value;
-    this->p_fan->error = this->p_coil->error;
+    self->p_coil->error =
+        self->p_coil->control_reference.ref_value - self->p_coil->filters[self->p_coil->ref_temp].value;
+    self->p_fan->error = self->p_coil->error;
 
     HAL_GPIO_WritePin(LED_FAN_GPIO_Port, LED_FAN_Pin, GPIO_PIN_SET);
     HAL_GPIO_WritePin(LED_COIL_GPIO_Port, LED_COIL_Pin, GPIO_PIN_SET);
 
     // Update set coil controller
-    if(this->p_coil->used_controller == PID)
+    if (self->p_coil->used_controller == PID)
     {
-        this->p_coil->u = PID_update(&(this->p_coil->PID_controller),
-            this->p_coil->error,
-            this->p_coil->u_saturated - this->p_coil->u);
-    }else 
+        self->p_coil->u = PID_update(&(self->p_coil->PID_controller), self->p_coil->error,
+                                     self->p_coil->u_saturated - self->p_coil->u);
+    }
+    else
     {
-        this->p_coil->u = this->p_coil->u_max * BBController_update(&(this->p_coil->BB_controller),
-            this->p_coil->error);
+        self->p_coil->u =
+            self->p_coil->u_max * BBController_update(&(self->p_coil->BB_controller), self->p_coil->error);
     }
 
     // Update set fan controller
-    if(this->p_fan->used_controller == PID)
+    if (self->p_fan->used_controller == PID)
     {
-        this->p_fan->u = PID_update(&(this->p_fan->PID_controller),
-            this->p_fan->error,
-            this->p_fan->u_saturated - this->p_fan->u);
-    }else 
+        self->p_fan->u =
+            PID_update(&(self->p_fan->PID_controller), self->p_fan->error, self->p_fan->u_saturated - self->p_fan->u);
+    }
+    else
     {
-        this->p_fan->u = this->p_fan->u_max * BBController_update(&(this->p_fan->BB_controller),
-            this->p_fan->error);
+        self->p_fan->u = self->p_fan->u_max * BBController_update(&(self->p_fan->BB_controller), self->p_fan->error);
     }
 
     // Saturate coil control signal
-    if (this->p_coil->u > this->p_coil->u_max) {
-        this->p_coil->u_saturated = this->p_coil->u_max;
+    if (self->p_coil->u > self->p_coil->u_max)
+    {
+        self->p_coil->u_saturated = self->p_coil->u_max;
     }
-    else if (this->p_coil->u < this->p_coil->u_min) {
-        this->p_coil->u_saturated = this->p_coil->u_min;
-    } else {
-        this->p_coil->u_saturated = this->p_coil->u;
+    else if (self->p_coil->u < self->p_coil->u_min)
+    {
+        self->p_coil->u_saturated = self->p_coil->u_min;
+    }
+    else
+    {
+        self->p_coil->u_saturated = self->p_coil->u;
     }
 
     // Saturate fan control signal
-    if (this->p_fan->u > this->p_fan->u_max) {
-        this->p_fan->u_saturated = this->p_fan->u_max;
+    if (self->p_fan->u > self->p_fan->u_max)
+    {
+        self->p_fan->u_saturated = self->p_fan->u_max;
     }
-    else if (this->p_fan->u < this->p_fan->u_min) {
-        this->p_fan->u_saturated = this->p_fan->u_min;
-    } else {
-        this->p_fan->u_saturated = this->p_fan->u;
+    else if (self->p_fan->u < self->p_fan->u_min)
+    {
+        self->p_fan->u_saturated = self->p_fan->u_min;
+    }
+    else
+    {
+        self->p_fan->u_saturated = self->p_fan->u;
     }
 
-    PWM_setPulse(&(this->p_coil->PWM[this->p_coil->ref_coil]), this->p_coil->u_saturated);
-    PWM_setPulse(&(this->p_fan->PWM), this->p_fan->u_saturated);
+    PWM_setPulse(&(self->p_coil->PWM[self->p_coil->ref_coil]), self->p_coil->u_saturated);
+    PWM_setPulse(&(self->p_fan->PWM), self->p_fan->u_saturated);
 }

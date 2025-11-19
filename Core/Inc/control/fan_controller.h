@@ -8,13 +8,14 @@
 #ifndef INC_CONTROL_FAN_CONTROLLER_H_
 #define INC_CONTROL_FAN_CONTROLLER_H_
 
-#include "stdint.h"
-#include "utils/iir_filter.h"
 #include "control/bang_bang.h"
-#include "control/pid.h"
-#include "control/controller_enums.h"
 #include "control/control_reference.h"
+#include "control/controller_enums.h"
+#include "control/pid.h"
+#include "stdint.h"
 #include "tim.h"
+#include "utils/iir_filter.h"
+
 
 typedef struct
 {
@@ -33,14 +34,13 @@ typedef struct
     uint16_t u_min;
 } FanController_t;
 
-void FanController_init(FanController_t *this);
-void FanController_update(FanController_t *this);
-void FanController_setFilters(FanController_t *this, uint16_t cutoff_freq);
-void FanController_setController(FanController_t *this,
-        UsedController_t controller);
-void FanController_setRefValue(FanController_t *this, uint16_t set_value);
-void FanController_setMode(FanController_t *this, OperationMode_t mode);
-void FanController_reset(FanController_t *this);
+void FanController_init(FanController_t *self);
+void FanController_update(FanController_t *self);
+void FanController_setFilters(FanController_t *self, uint16_t cutoff_freq);
+void FanController_setController(FanController_t *self, UsedController_t controller);
+void FanController_setRefValue(FanController_t *self, uint16_t set_value);
+void FanController_setMode(FanController_t *self, OperationMode_t mode);
+void FanController_reset(FanController_t *self);
 
 extern FanController_t fanController;
 

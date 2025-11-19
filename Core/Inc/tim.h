@@ -22,7 +22,8 @@
 #define __TIM_H__
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 /* Includes ------------------------------------------------------------------*/
@@ -30,48 +31,47 @@ extern "C" {
 
 /* USER CODE BEGIN Includes */
 #include "stdint.h"
-/*
- TIM1 - FAN CTRL
- TIM3 - FAN TACH
- TIM5 - COIL CTRL
- */
+    /*
+     TIM1 - FAN CTRL
+     TIM3 - FAN TACH
+     TIM5 - COIL CTRL
+     */
 
-/* USER CODE END Includes */
+    /* USER CODE END Includes */
 
-extern TIM_HandleTypeDef htim1;
+    extern TIM_HandleTypeDef htim1;
 
-extern TIM_HandleTypeDef htim3;
+    extern TIM_HandleTypeDef htim3;
 
-extern TIM_HandleTypeDef htim4;
+    extern TIM_HandleTypeDef htim4;
 
-extern TIM_HandleTypeDef htim5;
+    extern TIM_HandleTypeDef htim5;
 
-extern TIM_HandleTypeDef htim9;
+    extern TIM_HandleTypeDef htim9;
 
-/* USER CODE BEGIN Private defines */
-typedef struct
-{
-    TIM_HandleTypeDef *handle;
-    uint8_t channel;
-} PWMController_t;
+    /* USER CODE BEGIN Private defines */
+    typedef struct
+    {
+        TIM_HandleTypeDef *handle;
+        uint8_t channel;
+    } PWMController_t;
 
-/* USER CODE END Private defines */
+    /* USER CODE END Private defines */
 
-void MX_TIM1_Init(void);
-void MX_TIM3_Init(void);
-void MX_TIM4_Init(void);
-void MX_TIM5_Init(void);
-void MX_TIM9_Init(void);
+    void MX_TIM1_Init(void);
+    void MX_TIM3_Init(void);
+    void MX_TIM4_Init(void);
+    void MX_TIM5_Init(void);
+    void MX_TIM9_Init(void);
 
-void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
+    void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 
-/* USER CODE BEGIN Prototypes */
-void PWM_setPulse(PWMController_t *this, uint16_t pulse);
-/* USER CODE END Prototypes */
+    /* USER CODE BEGIN Prototypes */
+    void PWM_setPulse(PWMController_t *self, uint16_t pulse);
+    /* USER CODE END Prototypes */
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* __TIM_H__ */
-

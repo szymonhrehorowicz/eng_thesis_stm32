@@ -1,6 +1,38 @@
 {
 	"version": "2.0.0",
 	"tasks": [
+        // UNIT TESTS
+    {
+      "type": "shell",
+      "label": "[CONFIGURE] UnitTests",
+      "command": "cmake --preset=Debug",
+      "options": {
+        "cwd": "${workspaceFolder}/Tests/cmake"
+      },
+      "group": "build",
+      "problemMatcher": ["$gcc"]
+    },
+    {
+      "type": "shell",
+      "label": "[BUILD] UnitTests",
+      "command": "cmake --build --preset=Debug",
+      "options": {
+        "cwd": "${workspaceFolder}/Tests/cmake"
+      },
+      "group": "build",
+      "dependsOn": "[CONFIGURE] UnitTests",
+      "problemMatcher": ["$gcc"]
+    },
+    {
+      "type": "shell",
+      "label": "[RUN] UnitTests",
+      "command": "${workspaceFolder}/build/library-tests/UnitTests.exe",
+      "options": {
+        "cwd": "${workspaceFolder}/software/tests/unit_tests/cmake"
+      },
+      "group": "test",
+      "args": ["--gtest_filter=**"]
+    },
         {
             "type": "cppbuild",
             "label": "C/C++: cl.exe build active file",

@@ -7,33 +7,32 @@
 
 #include "control/pid.h"
 
-float PID_update(PID_t *this, float error, int16_t control_difference)
+float PID_update(PID_t *self, float error, int16_t control_difference)
 {
     // Calculate proportional part
-    this->u_p = (float) this->Kp * (float) error;
+    self->u_p = (float)self->Kp * (float)error;
 
     // Calculate integral part
-    this->integral_sum += error * this->sample_time / 1000.0f;
-    this->aw_integral_sum += (float)control_difference * (float)this->sample_time / 1000.0f;
-    this->u_i = (this->Ki * this->integral_sum) + (this->Kaw * this->aw_integral_sum);
+    self->integral_sum += error * self->sample_time / 1000.0f;
+    self->aw_integral_sum += (float)control_difference * (float)self->sample_time / 1000.0f;
+    self->u_i = (self->Ki * self->integral_sum) + (self->Kaw * self->aw_integral_sum);
 
     // Calculate derivative part
-    IIR_update(&this->error_difference, error - this->prev_error);
-    this->u_d = (float) this->Kd * (error - this->prev_error)
-            / ((float)this->sample_time / 1000.0f);
+    IIR_update(&self->error_difference, error - self->prev_error);
+    self->u_d = (float)self->Kd * (error - self->prev_error) / ((float)self->sample_time / 1000.0f);
 
     // Calculate control signal
-    this->prev_error = error;
+    self->prev_error = error;
 
-    return this->u_p + this->u_i + this->u_d;
+    return self->u_p + self->u_i + self->u_d;
 }
 
-void PID_reset(PID_t *this)
+void PID_reset(PID_t *self)
 {
-    this->prev_error = 0;
-    this->integral_sum = 0;
-    this->aw_integral_sum = 0;
-    this->u_p = 0;
-    this->u_i = 0;
-    this->u_d = 0;
+    self->prev_error = 0;
+    self->integral_sum = 0;
+    self->aw_integral_sum = 0;
+    self->u_p = 0;
+    self->u_i = 0;
+    self->u_d = 0;
 }

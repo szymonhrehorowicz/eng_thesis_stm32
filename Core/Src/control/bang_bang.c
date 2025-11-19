@@ -7,28 +7,28 @@
 
 #include "control/bang_bang.h"
 
-BBCommand_t BBController_update(BBController_t *this, float error)
+BBCommand_t BBController_update(BBController_t *self, float error)
 {
-    if((this->command == BB_OFF) && (error >= this->threshold_top))
+    if ((self->command == BB_OFF) && (error >= self->threshold_top))
     {
-        this->command = BB_ON;
+        self->command = BB_ON;
     }
 
-    if((this->command == BB_ON) && (error <= this->threshold_bottom))
+    if ((self->command == BB_ON) && (error <= self->threshold_bottom))
     {
-        this->command = BB_OFF;
+        self->command = BB_OFF;
     }
 
-    return this->command;
+    return self->command;
 }
 
-void BBController_reset(BBController_t *this)
+void BBController_reset(BBController_t *self)
 {
-    this->command = BB_OFF;
+    self->command = BB_OFF;
 }
 
-void BBController_setParams(BBController_t *this, float hysteresis)
+void BBController_setParams(BBController_t *self, float hysteresis)
 {
-    this->threshold_top = hysteresis / 2.0f;
-    this->threshold_bottom = -hysteresis / 2.0f;
+    self->threshold_top = hysteresis / 2.0f;
+    self->threshold_bottom = -hysteresis / 2.0f;
 }

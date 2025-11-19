@@ -1,0 +1,66 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 29,
+    "patch": 0
+  },
+
+  "configurePresets": [
+    {
+      "name": "base-unit-tests",
+      "hidden": true,
+      "description": "Base preset for all tests configurations",
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "YES",
+        "CMAKE_CXX_STANDARD": "23",
+        "CMAKE_CXX_STANDARD_REQUIRED": "YES",
+        "CMAKE_CXX_EXTENSIONS": "NO",
+        "CMAKE_C_STANDARD": "11",
+        "CMAKE_C_STANDARD_REQUIRED": "YES",
+        "CMAKE_C_EXTENSIONS": "NO"
+      },
+      "binaryDir": "build"
+    },
+    {
+      "name": "base-unit-tests-windows",
+      "hidden": true,
+      "inherits": "base-unit-tests",
+      "description": "Base preset for all tests configurations on Windows",
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      },
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "$env{LLVM_ROOT}/bin/clang-cl.exe",
+        "CMAKE_CXX_COMPILER": "$env{LLVM_ROOT}/bin/clang-cl.exe"
+      },
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": {
+          "hostOS": ["Windows"]
+        }
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      }
+    },
+    {
+      "name": "Debug",
+      "displayName": "Debug",
+      "description": "Debug",
+      "inherits": "base-unit-tests-windows",
+      "hidden": false,
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "Debug",
+      "configurePreset": "Debug",
+      "targets": ["UnitTests"]
+    }
+  ]
+}

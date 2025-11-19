@@ -27,8 +27,8 @@ typedef struct
     IIRfilter_t error_difference;
 } PID_t;
 
-float PID_update(PID_t *this, float error, int16_t control_difference);
-void PID_update_with_error_injection(PID_t *this, float error);
-void PID_reset(PID_t *this);
+float PID_update(PID_t *self, float error, int16_t control_difference);
+void PID_update_with_error_injection(PID_t *self, float error);
+void PID_reset(PID_t *self);
 
 #endif /* INC_CONTROL_PID_H_ */

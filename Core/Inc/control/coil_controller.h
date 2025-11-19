@@ -8,13 +8,14 @@
 #ifndef INC_CONTROL_COIL_CONTROLLER_H_
 #define INC_CONTROL_COIL_CONTROLLER_H_
 
-#include "stdint.h"
-#include "utils/iir_filter.h"
 #include "control/bang_bang.h"
-#include "control/pid.h"
-#include "control/controller_enums.h"
 #include "control/control_reference.h"
+#include "control/controller_enums.h"
+#include "control/pid.h"
+#include "stdint.h"
 #include "tim.h"
+#include "utils/iir_filter.h"
+
 
 #define NUMBER_OF_THERMISTORS 2u
 
@@ -38,17 +39,15 @@ typedef struct
     uint16_t u_min;
 } CoilController_t;
 
-void CoilController_init(CoilController_t *this);
-void CoilController_update(CoilController_t *this);
-void CoilController_setFilters(CoilController_t *this, uint16_t cutoff_freq);
-void CoilController_setController(CoilController_t *this,
-        UsedController_t controller);
-void CoilController_setRefTemp(CoilController_t *this,
-        RefTemperature_t ref_temp);
-void CoilController_setRefValue(CoilController_t *this, uint16_t set_value);
-void CoilController_setRefCoil(CoilController_t *this, RefCoil_t coil);
-void CoilController_setMode(CoilController_t *this, OperationMode_t mode);
-void CoilController_reset(CoilController_t *this);
+void CoilController_init(CoilController_t *self);
+void CoilController_update(CoilController_t *self);
+void CoilController_setFilters(CoilController_t *self, uint16_t cutoff_freq);
+void CoilController_setController(CoilController_t *self, UsedController_t controller);
+void CoilController_setRefTemp(CoilController_t *self, RefTemperature_t ref_temp);
+void CoilController_setRefValue(CoilController_t *self, uint16_t set_value);
+void CoilController_setRefCoil(CoilController_t *self, RefCoil_t coil);
+void CoilController_setMode(CoilController_t *self, OperationMode_t mode);
+void CoilController_reset(CoilController_t *self);
 
 extern CoilController_t coilController;
 
