@@ -7,7 +7,7 @@
 
 #include "control/pid.h"
 
-float PID_update(PID_t *self, float error, int16_t control_difference)
+float PID_update(PID_t *self, float error, float control_difference)
 {
     // Calculate proportional part
     self->u_p = (float)self->Kp * (float)error;

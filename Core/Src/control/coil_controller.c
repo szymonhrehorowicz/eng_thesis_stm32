@@ -106,7 +106,7 @@ void CoilController_update(CoilController_t *self)
 
         if (self->used_controller == PID)
         {
-            self->u = PID_update(&self->PID_controller, self->error, (self->u_saturated / 12.0f * 1000.0f) - self->u);
+            self->u = PID_update(&self->PID_controller, self->error, self->u_saturated - self->u);
         }
         else if (self->used_controller == BANG_BANG)
         {
